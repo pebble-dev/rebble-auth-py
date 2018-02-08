@@ -10,6 +10,7 @@ Flask-Login==0.4.1
 Flask-Migrate==2.1.1
 Flask-OAuthlib==0.9.4
 Flask-SQLAlchemy==2.3.2
+Flask-SSLify==0.1.5
 gevent==1.2.2
 greenlet==0.4.13
 idna==2.6
