@@ -16,7 +16,7 @@ def me():
 @api_ensure_pebble
 def pebble_auth_me():
     user = request.oauth.user
-    return jsonify(id=user.pebble_auth_uid, email=user.email, name=user.email.split('@')[0].split('+')[0])
+    return jsonify(id=user.pebble_auth_uid, email=user.email, name=user.name)
 
 
 @api.route('/me/pebble/dev-portal')
