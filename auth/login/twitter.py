@@ -1,7 +1,7 @@
-from flask import url_for, g
+from flask import g
 
 from ..models import db
-from .base import auth, login_blueprint, complete_auth_flow
+from .base import auth, login_blueprint, complete_auth_flow, secure_url_for
 
 twitter = auth.remote_app(
     name='twitter',
@@ -20,7 +20,7 @@ def get_token():
 
 @login_blueprint.route("/twitter")
 def twitter_auth_start():
-    return twitter.authorize(url_for('login.twitter_auth_complete', _external=True))
+    return twitter.authorize(secure_url_for('.twitter_auth_complete'))
 
 
 @login_blueprint.route("/twitter/complete")

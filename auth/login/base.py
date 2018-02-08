@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, session, request, redirect, abort, url_for
+from flask import Blueprint, render_template, session, request, redirect, abort, url_for, current_app
 from flask_login import LoginManager, login_user, current_user, login_required
 from flask_oauthlib.client import OAuth
 
@@ -7,6 +7,8 @@ from ..models import db, User, UserIdentity
 login_manager = LoginManager()
 login_blueprint = Blueprint('login', __name__)
 auth = OAuth()
+
+secure_url_for = lambda x: url_for(x, _external=True, _scheme='https' if not current_app.debug else 'http')
 
 
 @login_manager.user_loader

@@ -1,8 +1,8 @@
-from flask import url_for, g
+from flask import g
 import jwt
 
 from ..models import db
-from .base import auth, login_blueprint, complete_auth_flow
+from .base import auth, login_blueprint, complete_auth_flow, secure_url_for
 
 google = auth.remote_app(
     'google',
@@ -18,7 +18,7 @@ google = auth.remote_app(
 
 @login_blueprint.route("/google")
 def google_auth_start():
-    return google.authorize(url_for('login.google_auth_complete', _external=True))
+    return google.authorize(secure_url_for('.google_auth_complete'))
 
 
 @login_blueprint.route("/google/complete")
