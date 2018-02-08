@@ -1,0 +1,7 @@
+{% extends "base.html" %}
+{% block body %}
+<ul>
+    <li><a href="{{ url_for('login.google_auth_start') }}">Google</a></li>
+    <li><a href="{{ url_for('login.twitter_auth_start') }}">Twitter</a></li>
+</ul>
+{% endblock %}
