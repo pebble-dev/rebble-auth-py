@@ -44,23 +44,3 @@ def ensure_pebble(fn):
         else:
             return fn(*args, **kwargs)
     return wrapper
-
-
-# # TODO TOMORROW: make this a decorator so we can actually return things usefully (+ ease of use)
-# def ensure_pebble(user):
-#     # STAGE 1: you have to do pebble auth.
-#     if not user.pebble_dev_portal_uid or not user.pebble_auth_uid:
-#         if current_user.is_authenticated:
-#             return redirect(url_for('login.demand_pebble'))
-#         else:
-#             abort(401)
-
-    # dirty = False
-    # if user.pebble_auth_uid is None:
-    #     user.pebble_auth_uid = id_generator.generate()
-    #     dirty = True
-    # if user.pebble_dev_portal_uid is None:
-    #     user.pebble_dev_portal_uid = id_generator.generate()
-    #     dirty = True
-    # if dirty:
-    #     db.session.commit()
