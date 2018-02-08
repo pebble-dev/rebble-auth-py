@@ -1,9 +1,38 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta charset="utf-8">
         <title>Rebble Auth</title>
+        <meta name="description" content="Rebble auth's login page">
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+        <link rel="alternate" type="application/rss+xml" title="Rebble" href="http://rebble.io/feed.xml">
+        <link rel="icon" type="image/x-icon" href="http://rebble.io/images/favicon.ico">
+        <link rel="stylesheet" href="http://rebble.io/css/common.css">
     </head>
     <body>
+        <header>
+            <i class="rebble-logo-light large-icon"></i>
+            <span class="headertext">
+                <span class="sitename"><a href="http://rebble.io/">Rebble</a></span>
+            </span>
+            <i class="rebble-logo-spacer large-icon"></i>
+        </header>
+        <ul id="index">
+            <li><a href="http://rebble.io/" class="">home</a></li>
+            <li><a href="http://rebble.io/faq/">faq</a></li>
+            <li><a href="http://rebble.io/team/">team</a></li>
+            <li><a href="http://rebble.io/projects/">projects</a></li>
+            <li><a href="http://auth.rebble.io/" class="selected">auth</a></li>
+        </ul>
     {% block body %}{% endblock %}
     </body>
+    <footer>
+        <div class="text-content">
+            <p>Join us on the
+                <a href="https://discordapp.com/invite/aRUAYFN">
+                    officially unofficial Pebble Discord server!</a>
+            </p>
+        </div>
+    </footer>
 </html>
