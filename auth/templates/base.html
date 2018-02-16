@@ -1,9 +1,31 @@
 <!DOCTYPE html>
 <html>
     <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <meta charset="utf-8">
         <title>Rebble Auth</title>
+        <meta name="description" content="Rebble auth's login page">
+        <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+        <link rel="icon" type="image/x-icon" href="//rebble.io/images/favicon.ico">
+        <link rel="stylesheet" href="//rebble.io/css/common.css">
     </head>
     <body>
-    {% block body %}{% endblock %}
+        <header>
+            <i class="rebble-logo-light large-icon"></i>
+            <span class="headertext">
+                <span class="sitename">Rebble</span>
+                <span class="separator">·</span>
+                <span class="pagename">Auth</span>
+            </span>
+            <i class="rebble-logo-spacer large-icon"></i>
+        </header>
+        <section>
+            {% block body %}{% endblock %}
+        </section>
     </body>
+    <footer>
+        <div class="text-content">
+            <p>Made by awesome people</p>
+        </div>
+    </footer>
 </html>

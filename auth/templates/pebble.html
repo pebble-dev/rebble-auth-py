@@ -1,5 +1,52 @@
 {% extends "base.html" %}
 {% block body %}
-    <p>This is stage 1; you must log in with pebble.</p>
-    <p><a href="todo">Pebble auth</a></p>
+<style>
+        @import url('https://fonts.googleapis.com/css?family=Roboto:500');
+        .linklist {
+            list-style: none;
+            display: block;
+            padding-left: 0;
+        }
+        .sign-in-button {
+            height: 30px;
+            max-width: 300px;
+            box-shadow: 0 2px 4px 0 rgba(0,0,0,.25);
+            margin-left: auto;
+            margin-right: auto;
+            margin-bottom: 5px;
+        }
+        .sign-in-button a {
+            text-decoration: none;
+            font-weight: 500;
+            font-family: 'Roboto', sans-serif;
+            text-transform: uppercase;
+        }
+        .pebble {
+            display: block;
+            background: #ff4700; 
+            padding-left: 20px;
+            padding: 10px;
+            text-align: center;
+        }
+        .pebble span.text {
+            color: rgb(255, 255, 255);
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .small-notice {
+            max-width: 320px;
+            font-size: 15px;
+            color: rgba(0, 0, 0, 0.54);
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .small-notice p {
+            margin: 0;
+        }
+    </style>
+    <ul class="linklist">
+        <li class="sign-in-button pebble"><a href="TODO"><span class="text">Sign in with Pebble</span></a></li>
+        <li class="small-notice"><p>This is stage 1; you must log in with pebble.</p></li>
+    </ul>
+    
 {% endblock %}
