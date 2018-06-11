@@ -28,14 +28,6 @@ init_api(app)
 def root():
     return render_template('logged-in.html')
 
-@app.route("/tos")
-def tos():
-    return render_template('terms.html')
-
-@app.route("/privacy")
-def privacy():
-    return render_template('privacy.html')
-
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
