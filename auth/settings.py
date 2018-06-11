@@ -12,6 +12,10 @@ config = {
         'consumer_key': environ['TWITTER_CONSUMER_KEY'],
         'consumer_secret': environ['TWITTER_CONSUMER_SECRET'],
     },
+    'AUTH_GITHUB': {
+        'consumer_key': environ['GITHUB_CONSUMER_KEY'],
+        'consumer_secret': environ['GITHUB_CONSUMER_SECRET'],
+    }
 }
 
 if 'PEBBLE_CONSUMER_KEY' in environ and 'PEBBLE_CONSUMER_SECRET' in environ:

@@ -43,6 +43,8 @@ environment variables (primarily for deployment reasons):
   Google auth.
 - `TWITTER_CONSUMER_KEY` and `TWITTER_CONSUMER_SECRET` are used for
   Twitter auth.
+- `GITHUB_CONSUMER_KEY` and `GITHUB_CONSUMER_SECRET` are used for
+  Github auth.
 - `FLASK_APP` isn't used by the app, but is needed if you want `flask`
   commands to work. Set it to `auth/__init__.py`.
 
