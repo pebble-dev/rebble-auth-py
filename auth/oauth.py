@@ -1,35 +1,60 @@
-import collections
 from datetime import datetime, timedelta
 
-from flask import Blueprint, abort
+from flask import Blueprint, abort, render_template, request
 from flask_oauthlib.provider import OAuth2Provider
 from oauthlib.common import generate_token as generate_random_token
 from flask_login import current_user, login_required
 
 from .models import db, IssuedToken, AuthClient, User
+from .redis import client as redis
+import json
 
 oauth_bp = Blueprint('oauth_bp', __name__)
 oauth = OAuth2Provider()
 
-Grant = collections.namedtuple('Grant', 'client_id code user scopes expires redirect_uri')
-def delete_grant(self: Grant):
-    del grants[self.client_id, self.code]
-Grant.delete = delete_grant
-grants = {}
+
+class Grant:
+    def __init__(self, client_id, code, user_id, scopes, redirect_uri):
+        self.client_id = client_id
+        self.code = code
+        self.user_id = user_id
+        self.scopes = scopes
+        self.redirect_uri = redirect_uri
+
+    @property
+    def user(self):
+        return User.query.filter_by(id=self.user_id).one()
+
+    def delete(self):
+        redis.delete(self.key)
+
+    @property
+    def key(self):
+        return self.redis_key(self.client_id, self.code)
+
+    def serialise(self):
+        return json.dumps([self.client_id, self.code, self.user_id, self.scopes, self.redirect_uri]).encode('utf-8')
+
+    @classmethod
+    def deserialise(cls, serialised):
+        return cls(*json.loads(serialised.decode('utf-8')))
+
+    @classmethod
+    def redis_key(cls, client_id, code):
+        return f'grant-{client_id}-{code}'
 
 
 @oauth.grantgetter
 def load_grant(client_id, code):
-    return grants[client_id, code]
+    return Grant.deserialise(redis.get(Grant.redis_key(client_id, code)))
 
 
 @oauth.grantsetter
 def set_grant(client_id, code, request, *args, **kwargs):
     if not current_user.is_authenticated:
         return None
-    expires = datetime.utcnow() + timedelta(seconds=100)
-    grant = Grant(client_id, code['code'], current_user._get_current_object(), request.scopes, expires, request.redirect_uri)
-    grants[grant.client_id, grant.code] = grant
+    grant = Grant(client_id, code['code'], current_user.id, request.scopes, request.redirect_uri)
+    redis.setex(grant.key, 100, grant.serialise())
     return grant
 
 
@@ -71,7 +96,7 @@ def set_token(token, request, *args, **kwargs):
 
 @oauth.clientgetter
 def get_client(client_id):
-    return AuthClient.query.filter_by(client_id=client_id).first()
+    return AuthClient.query.filter_by(client_id=client_id).one()
 
 
 @oauth_bp.route('/authorise', methods=['GET', 'POST'])
@@ -85,6 +110,13 @@ def authorise(*args, **kwargs):
 @oauth.token_handler
 def access_token():
     return None
+
+
+@oauth_bp.route('/error')
+def oauth_error():
+    return render_template('oauth-error.html',
+                           error=request.args.get('error', 'unknown'),
+                           error_description=request.args.get('error_description', '')), 400
 
 
 def generate_token(request, refresh_token=False):
@@ -101,5 +133,6 @@ def generate_token(request, refresh_token=False):
 def init_app(app):
     app.config['OAUTH2_PROVIDER_TOKEN_EXPIRES_IN'] = 315576000  # 10 years
     app.config['OAUTH2_PROVIDER_TOKEN_GENERATOR'] = generate_token
+    app.config['OAUTH2_PROVIDER_ERROR_ENDPOINT'] = 'oauth_bp.oauth_error'
     oauth.init_app(app)
     app.register_blueprint(oauth_bp, url_prefix='/oauth')

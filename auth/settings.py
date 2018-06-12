@@ -4,6 +4,7 @@ config = {
     'SECRET_KEY': environ['SECRET_KEY'],
 #    'SERVER_NAME': f"auth.{environ['DOMAIN_ROOT']}",
     'SQLALCHEMY_DATABASE_URI': environ['DATABASE_URL'],
+    'REDIS_URL': environ['REDIS_URL'],
     'AUTH_GOOGLE': {
         'consumer_key': environ['GOOGLE_CONSUMER_KEY'],
         'consumer_secret': environ['GOOGLE_CONSUMER_SECRET'],

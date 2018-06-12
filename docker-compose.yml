@@ -11,9 +11,12 @@ services:
     environment:
       - DEBUG=1
       - DATABASE_URL=postgres://postgres@db/postgres
+      - REDIS_URL=redis://redis/0
       - HOST=0.0.0.0
       - FLASK_APP=auth/__init__.py
     env_file:
       - ./.env
   db:
     image: "postgres:alpine"
+  redis:
+    image: "redis:3.2-alpine"

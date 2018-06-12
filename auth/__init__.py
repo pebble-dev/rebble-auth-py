@@ -7,6 +7,7 @@ from .login import init_app as init_login
 from .login.pebble import ensure_pebble
 from .oauth import init_app as init_oauth
 from .api import init_app as init_api
+from .redis import init_app as init_redis
 
 from .settings import config
 
@@ -17,6 +18,7 @@ sslify = SSLify(app)
 if not app.debug:
     app.config['PREFERRED_URL_SCHEME'] = 'https'
 init_db(app)
+init_redis(app)
 init_login(app)
 init_oauth(app)
 init_api(app)
