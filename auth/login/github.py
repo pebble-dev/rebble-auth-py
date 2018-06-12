@@ -1,5 +1,4 @@
 from flask import g
-import jwt
 
 from ..models import db
 from .base import auth, login_blueprint, complete_auth_flow, secure_url_for
@@ -29,7 +28,7 @@ def github_auth_complete():
     g.github_token = (resp['access_token'], '')
     me = github.get('user').data
     me_emails = github.get('user/emails').data
-    email = [x for x in me_emails if x["primary"] == True][0]["email"]
+    email = [x for x in me_emails if x["primary"]][0]["email"]
     response = complete_auth_flow(github.name, str(me["id"]), me["name"], email)
     db.session.commit()
     return response
