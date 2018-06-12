@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 from flask_login import login_required
 from flask_sslify import SSLify
 
@@ -26,4 +26,8 @@ init_api(app)
 @login_required
 @ensure_pebble
 def root():
-    return 'hi there'
+    return render_template('logged-in.html')
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
