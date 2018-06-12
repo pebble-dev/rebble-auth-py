@@ -28,6 +28,7 @@ init_api(app)
 def root():
     return render_template('logged-in.html')
 
+
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
