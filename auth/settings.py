@@ -16,6 +16,10 @@ config = {
     'AUTH_GITHUB': {
         'consumer_key': environ['GITHUB_CONSUMER_KEY'],
         'consumer_secret': environ['GITHUB_CONSUMER_SECRET'],
+    },
+    'AUTH_FACEBOOK': {
+        'consumer_key': environ['FACEBOOK_CONSUMER_KEY'],
+        'consumer_secret': environ['FACEBOOK_CONSUMER_SECRET'],
     }
 }
 
