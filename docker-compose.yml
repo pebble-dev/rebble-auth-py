@@ -8,6 +8,7 @@ services:
       - .:/code
     depends_on:
       - db
+      - redis
     environment:
       - DEBUG=1
       - DATABASE_URL=postgres://postgres@db/postgres
