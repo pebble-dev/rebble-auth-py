@@ -30,7 +30,7 @@ def demand_pebble():
 
 
 def redirect_next():
-    next_url = session.get('next', '/')
+    next_url = session.get('next') or '/'
     if next_url.startswith('//') or ':' in next_url:
         next_url = '/'
     return redirect(next_url)
