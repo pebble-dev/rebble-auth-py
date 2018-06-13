@@ -28,6 +28,13 @@ def demand_pebble():
     return render_template('pebble.html')
 
 
+def redirect_next():
+    next_url = session.get('next', '/')
+    if next_url.startswith('//') or ':' in next_url:
+        next_url = '/'
+    return redirect(next_url)
+
+
 def complete_auth_flow(idp_name, idp_user_id, user_name, user_email):
     user = current_user._get_current_object()
     identity = UserIdentity.query.filter_by(idp=idp_name, idp_user_id=idp_user_id).one_or_none()
@@ -51,7 +58,7 @@ def complete_auth_flow(idp_name, idp_user_id, user_name, user_email):
             print('Known identity')
     db.session.commit()
     login_user(identity.user, remember=True)
-    return redirect(session.get('next') or '/')
+    return redirect_next()
 
 
 def init_app(app):

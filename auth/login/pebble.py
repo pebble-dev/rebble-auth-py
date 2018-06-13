@@ -6,12 +6,11 @@ from uuid import getnode
 
 from flask import request, abort, redirect, url_for, session
 from flask_login import current_user, login_required
-from ..models import db
 
 from flask import g
 
 from ..models import db
-from .base import auth, login_blueprint, secure_url_for
+from .base import auth, login_blueprint, secure_url_for, redirect_next
 
 pebble = auth.remote_app(
     'pebble',
@@ -48,7 +47,7 @@ def pebble_auth_complete():
     store_info = pebble.request('https://dev-portal.getpebble.com/api/users/me').data
     current_user.pebble_dev_portal_uid = store_info['users'][0]['id']
     db.session.commit()
-    return redirect(session.get('next') or '/')
+    return redirect_next()
 
 
 # This generates a MongoDB-style ObjectID, which is what all Pebble identifiers are.
