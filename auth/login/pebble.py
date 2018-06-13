@@ -10,7 +10,7 @@ from flask_login import current_user, login_required
 from flask import g
 
 from ..models import db
-from .base import auth, login_blueprint, secure_url_for, redirect_next
+from .base import auth, login_blueprint, secure_url_for, redirect_next, get_state, prepare_state, validate_state
 
 pebble = auth.remote_app(
     'pebble',
@@ -20,6 +20,7 @@ pebble = auth.remote_app(
     access_token_url='https://auth.getpebble.com/oauth/token',
     authorize_url='https://auth.getpebble.com/oauth/authorize',
     app_key='AUTH_PEBBLE',
+    request_token_params={'state': get_state},
 )
 
 
@@ -31,12 +32,14 @@ def get_token():
 @login_blueprint.route("/pebble")
 @login_required
 def pebble_auth_start():
+    prepare_state()
     return pebble.authorize(secure_url_for('.pebble_auth_complete'))
 
 
 @login_blueprint.route("/pebble/complete")
 @login_required
 def pebble_auth_complete():
+    validate_state()
     resp = pebble.authorized_response()
     if resp is None:
         return 'Failed.'

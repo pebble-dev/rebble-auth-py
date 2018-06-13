@@ -1,3 +1,4 @@
+import secrets
 from flask import Blueprint, render_template, session, request, redirect, abort, url_for, current_app
 from flask_login import LoginManager, login_user, current_user, login_required
 from flask_oauthlib.client import OAuth
@@ -33,6 +34,23 @@ def redirect_next():
     if next_url.startswith('//') or ':' in next_url:
         next_url = '/'
     return redirect(next_url)
+
+
+def prepare_state():
+    session['oauth_state'] = secrets.token_urlsafe()
+
+
+def get_state():
+    return session['oauth_state']
+
+
+def validate_state():
+    expected_state = session['oauth_state']
+    if expected_state is None:
+        abort(401)
+    del session['oauth_state']
+    if request.args.get('state') != expected_state:
+        abort(401)
 
 
 def complete_auth_flow(idp_name, idp_user_id, user_name, user_email):

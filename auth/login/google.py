@@ -2,7 +2,7 @@ from flask import g
 import jwt
 
 from ..models import db
-from .base import auth, login_blueprint, complete_auth_flow, secure_url_for
+from .base import auth, login_blueprint, complete_auth_flow, secure_url_for, get_state, prepare_state, validate_state
 
 google = auth.remote_app(
     'google',
@@ -11,18 +11,20 @@ google = auth.remote_app(
     access_token_method='POST',
     access_token_url='https://accounts.google.com/o/oauth2/token',
     authorize_url='https://accounts.google.com/o/oauth2/auth',
-    request_token_params={'scope': 'email profile'},
+    request_token_params={'scope': 'email profile', 'state': get_state},
     app_key='AUTH_GOOGLE',
 )
 
 
 @login_blueprint.route("/google")
 def google_auth_start():
+    prepare_state()
     return google.authorize(secure_url_for('.google_auth_complete'))
 
 
 @login_blueprint.route("/google/complete")
 def google_auth_complete():
+    validate_state()
     resp = google.authorized_response()
     if resp is None:
         return 'Failed.'
