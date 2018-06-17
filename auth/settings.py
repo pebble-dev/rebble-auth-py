@@ -20,7 +20,8 @@ config = {
     'AUTH_FACEBOOK': {
         'consumer_key': environ['FACEBOOK_CONSUMER_KEY'],
         'consumer_secret': environ['FACEBOOK_CONSUMER_SECRET'],
-    }
+    },
+    'DEVELOPMENT_MODE': 'DEVELOPMENT_MODE' in environ
 }
 
 if 'PEBBLE_CONSUMER_KEY' in environ and 'PEBBLE_CONSUMER_SECRET' in environ:

@@ -20,7 +20,7 @@ def load_user(user_id):
 @login_blueprint.route("/")
 def login():
     session['next'] = request.args.get('next', None)
-    return render_template('login.html')
+    return render_template('login.html', enable_dummy = current_app.config['DEVELOPMENT_MODE'])
 
 
 @login_blueprint.route("/demand_pebble")

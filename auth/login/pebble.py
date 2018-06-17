@@ -9,6 +9,8 @@ from flask_login import current_user, login_required
 
 from flask import g
 
+from flask import current_app
+
 from ..models import db
 from .base import auth, login_blueprint, secure_url_for, redirect_next, get_state, prepare_state, validate_state
 
@@ -33,8 +35,10 @@ def get_token():
 @login_required
 def pebble_auth_start():
     prepare_state()
-    return pebble.authorize(secure_url_for('.pebble_auth_complete'))
-
+    if current_app.config['DEVELOPMENT_MODE']:
+        return pebble.authorize('http://localhost:60000')
+    else:
+        return pebble.authorize(secure_url_for('.pebble_auth_complete'))
 
 @login_blueprint.route("/pebble/complete")
 @login_required
