@@ -28,7 +28,7 @@ pebble = auth.remote_app(
 
 @pebble.tokengetter
 def get_token():
-    return g.pebble_token
+    return current_user.pebble_token,
 
 
 @login_blueprint.route("/pebble")
@@ -40,6 +40,7 @@ def pebble_auth_start():
     else:
         return pebble.authorize(secure_url_for('.pebble_auth_complete'))
 
+
 @login_blueprint.route("/pebble/complete")
 @login_required
 def pebble_auth_complete():
@@ -47,7 +48,6 @@ def pebble_auth_complete():
     resp = pebble.authorized_response()
     if resp is None:
         return 'Failed.'
-    g.pebble_token = (resp['access_token'],)
     current_user.pebble_token = resp['access_token']
     user_info = pebble.request('me.json').data
     current_user.pebble_auth_uid = user_info['id']

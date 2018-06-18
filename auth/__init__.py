@@ -28,9 +28,9 @@ init_api(app)
 @login_required
 @ensure_pebble
 def root():
-    g.pebble_token = (current_user.pebble_token, )
     user_info = pebble.request('me.json').data
-    return render_template('logged-in.html', pebble_auth_uid = current_user.pebble_auth_uid, name = current_user.name, email = current_user.email, pebble_email = user_info['email'])
+    return render_template('logged-in.html', pebble_auth_uid=current_user.pebble_auth_uid,
+                           name=current_user.name, email=current_user.email, pebble_email=user_info['email'])
 
 
 @app.errorhandler(404)

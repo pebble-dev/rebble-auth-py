@@ -2,8 +2,13 @@
 {% block body %}
 <h2>You're all set!</h2>
 <p>
-    It looks like you're logged in as {{ name }} &lt;{{ email }}&gt;.  We have your
-    Pebble account (the one with e-mail address {{ pebble_email }}) all
+    It looks like you're logged in
+    {% if name %}
+        as {{ name }} &lt;{{ email }}&gt;.
+    {% else %}
+        using {{ email }}.
+    {% endif %}
+    We have your Pebble account (the one with e-mail address {{ pebble_email }}) all
     linked and ready to go.
     Over the coming days, we'll import your data.
     Keep an eye on <a href="https://rebble.io/">rebble.io</a> for more information!
