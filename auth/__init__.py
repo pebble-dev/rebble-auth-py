@@ -1,10 +1,10 @@
-from flask import Flask, render_template
-from flask_login import login_required
+from flask import Flask, render_template, g
+from flask_login import login_required, current_user
 from flask_sslify import SSLify
 
 from .models import init_app as init_db
 from .login import init_app as init_login
-from .login.pebble import ensure_pebble
+from .login.pebble import ensure_pebble, pebble
 from .oauth import init_app as init_oauth
 from .api import init_app as init_api
 from .redis import init_app as init_redis
@@ -28,7 +28,9 @@ init_api(app)
 @login_required
 @ensure_pebble
 def root():
-    return render_template('logged-in.html')
+    g.pebble_token = (current_user.pebble_token, )
+    user_info = pebble.request('me.json').data
+    return render_template('logged-in.html', pebble_auth_uid = current_user.pebble_auth_uid, name = current_user.name, email = current_user.email, pebble_email = user_info['email'])
 
 
 @app.errorhandler(404)
