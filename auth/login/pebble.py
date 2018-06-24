@@ -35,7 +35,7 @@ def get_token():
 @login_required
 def pebble_auth_start():
     prepare_state()
-    if current_app.config['DEVELOPMENT_MODE']:
+    if current_app.env == 'development':
         return pebble.authorize('http://localhost:60000')
     else:
         return pebble.authorize(secure_url_for('.pebble_auth_complete'))

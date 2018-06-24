@@ -10,6 +10,7 @@ login_blueprint = Blueprint('login', __name__)
 auth = OAuth()
 
 secure_url_for = lambda x: url_for(x, _external=True, _scheme='https' if not current_app.debug else 'http')
+dummy_enabled = False
 
 
 @login_manager.user_loader
@@ -20,7 +21,7 @@ def load_user(user_id):
 @login_blueprint.route("/")
 def login():
     session['next'] = request.args.get('next', None)
-    return render_template('login.html', enable_dummy = current_app.config['DEVELOPMENT_MODE'])
+    return render_template('login.html', enable_dummy=dummy_enabled)
 
 
 @login_blueprint.route("/demand_pebble")
@@ -80,6 +81,9 @@ def complete_auth_flow(idp_name, idp_user_id, user_name, user_email):
 
 
 def init_app(app):
+    global dummy_enabled
+    if app.env == 'development':
+        dummy_enabled = True
     app.register_blueprint(login_blueprint, url_prefix='/auth')
     login_manager.login_view = 'login.login'
     login_manager.init_app(app)
