@@ -24,7 +24,11 @@ def pebble_auth_me():
 @api_ensure_pebble
 def pebble_dev_portal_me():
     user = request.oauth.user
-    return jsonify([{'id': user.pebble_dev_portal_uid, 'uid': user.pebble_auth_uid}])
+    return jsonify(users=[{
+        'id': user.pebble_dev_portal_uid,
+        'uid': user.pebble_auth_uid,
+        'rebble_id': user.id,
+    }])
 
 
 def init_app(app, url_prefix='/api/v1'):
