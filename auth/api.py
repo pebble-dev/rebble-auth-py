@@ -28,6 +28,7 @@ def pebble_dev_portal_me():
         'id': user.pebble_dev_portal_uid,
         'uid': user.pebble_auth_uid,
         'rebble_id': user.id,
+        'name': user.name,
     })
 
 
