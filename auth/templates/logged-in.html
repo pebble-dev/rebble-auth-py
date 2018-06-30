@@ -8,9 +8,17 @@
     {% else %}
         using <strong>{{ email }}</strong>.
     {% endif %}
-    We have your Pebble account (the one with e-mail address <strong>{{ pebble_email }}</strong>) all
-    linked and ready to go.
-    Over the coming hours, we'll import your data.
-    Keep an eye on <a href="https://rebble.io/">rebble.io</a> for more information!
+    {% if pebble_email %}
+        We have your Pebble account (the one with e-mail address <strong>{{ pebble_email }}</strong>) linked,
+        and
+        {% if has_data %}
+            we have already imported your data.
+        {% else %}
+            we're working on importing your data.
+        {% endif %}
+    {% else %}
+        You don't have a Pebble account linked, so you'll be starting from a clean slate.
+    {% endif %}
 </p>
+    <p>Keep an eye on <a href="https://rebble.io/">rebble.io</a> for instructions very soon!</p>
 {% endblock %}

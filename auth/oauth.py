@@ -85,12 +85,8 @@ def set_token(token, request, *args, **kwargs):
                         client_id=request.client.client_id, user_id=request.user.id,
                         scopes=scopes)
 
-    # We can't store the token if it's a pebble token, because pebble tokens aren't unique, and so do terrible things
-    # to the database structure. This regrettably means we're going to have to carry a hack for supporting pebble
-    # tokens around forever.
-    if 'pebble_token' not in scopes:
-        db.session.add(token)
-        db.session.commit()
+    db.session.add(token)
+    db.session.commit()
     return token
 
 
@@ -120,19 +116,11 @@ def oauth_error():
 
 
 def generate_token(request, refresh_token=False):
-    # We take the 'pebble_token' scope to mean that we're authenticating a pebble service that expects to get
-    # a pebble token, which means we shouldn't generate a new one for it.
-    if 'pebble_token' in request.scopes and not refresh_token:
-        if request.user.pebble_token:
-            return request.user.pebble_token
-        else:
-            abort(401)
     return generate_random_token()
 
 
 def init_app(app):
     app.config['OAUTH2_PROVIDER_TOKEN_EXPIRES_IN'] = 315576000  # 10 years
-    app.config['OAUTH2_PROVIDER_TOKEN_GENERATOR'] = generate_token
     app.config['OAUTH2_PROVIDER_ERROR_ENDPOINT'] = 'oauth_bp.oauth_error'
     oauth.init_app(app)
     app.register_blueprint(oauth_bp, url_prefix='/oauth')

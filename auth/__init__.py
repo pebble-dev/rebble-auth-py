@@ -26,11 +26,14 @@ init_api(app)
 
 @app.route("/")
 @login_required
-@ensure_pebble
 def root():
-    user_info = pebble.request('me.json').data
-    return render_template('logged-in.html', pebble_auth_uid=current_user.pebble_auth_uid,
-                           name=current_user.name, email=current_user.email, pebble_email=user_info['email'])
+    if current_user.pebble_token:
+        pebble_email = pebble.request('me.json').data['email']
+    else:
+        pebble_email = None
+    has_data = pebble_email is not None and current_user.id <= 34559
+    return render_template('logged-in.html', name=current_user.name, email=current_user.email,
+                           pebble_email=pebble_email, has_data=has_data)
 
 
 @app.errorhandler(404)

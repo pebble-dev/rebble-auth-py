@@ -72,23 +72,29 @@ class ObjectIdGenerator:
 id_generator = ObjectIdGenerator()
 
 
+def generate_pebble_ids(user):
+    must_commit = False
+    if user.pebble_dev_portal_uid is None:
+        user.pebble_dev_portal_uid = id_generator.generate()
+        must_commit = True
+    if user.pebble_auth_uid is None:
+        user.pebble_auth_uid = id_generator.generate()
+        must_commit = True
+    if must_commit:
+        db.session.commit()
+
+
 def api_ensure_pebble(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
-        user = request.oauth.user
-        if user.pebble_auth_uid is None or user.pebble_dev_portal_uid is None:
-            return abort(401)
-        else:
-            return fn(*args, **kwargs)
+        generate_pebble_ids(request.oauth.user)
+        return fn(*args, **kwargs)
     return wrapper
 
 
 def ensure_pebble(fn):
     @wraps(fn)
     def wrapper(*args, **kwargs):
-        user = current_user
-        if user.pebble_auth_uid is None or user.pebble_dev_portal_uid is None:
-            return redirect(url_for('login.demand_pebble'))
-        else:
-            return fn(*args, **kwargs)
+        generate_pebble_ids(current_user)
+        return fn(*args, **kwargs)
     return wrapper
