@@ -1,4 +1,8 @@
+import datetime
 from flask import Blueprint, request, jsonify, abort
+from oauthlib.common import generate_token
+
+from auth.models import IssuedToken, db
 from .oauth import oauth
 from .login.pebble import api_ensure_pebble
 
@@ -12,7 +16,14 @@ def me():
         uid=request.oauth.user.id,
         name=request.oauth.user.name,
         is_subscribed=request.oauth.user.has_active_sub,
+        scopes=request.oauth.scopes,
     )
+
+
+@api.route('/me/token')
+@oauth.require_oauth()
+def token_info():
+    return jsonify(scopes=request.oauth.scopes)
 
 
 @api.route('/me/pebble/auth')
@@ -34,6 +45,20 @@ def pebble_dev_portal_me():
         'rebble_id': user.id,
         'name': user.name,
     })
+
+
+@api.route('/dictation-token')
+@oauth.require_oauth('pebble')
+def get_dictation_token():
+    user = request.oauth.user
+    asr_token = IssuedToken.query.filter_by(user_id=user.id, scopes='{asr}').first()
+    if not asr_token:
+        asr_token = IssuedToken(user_id=user.id, client_id='asr', scopes=['asr'],
+                                expires=datetime.datetime.utcnow() + datetime.timedelta(days=3650),
+                                access_token=generate_token(15, 'abcdefghijklmnopqrsstuvwxyz0123456789'), refresh_token=generate_token())
+        db.session.add(asr_token)
+        db.session.commit()
+    return jsonify(token=asr_token.access_token)
 
 
 def init_app(app, url_prefix='/api/v1'):
