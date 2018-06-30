@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+{% block body %}
+    <style>
+        table.actually-a-table {
+            border-collapse: collapse;
+        }
+        table.actually-a-table tr {
+            border-bottom: 1px solid #dbdadb;
+        }
+        table.actually-a-table tr:last-child {
+          border: 0;
+        }
+    </style>
+    <h2>Rebble Account</h2>
+    <table class="actually-a-table">
+        <tr>
+            <td>Account name</td>
+            <td>{% if user.name %}{{ user.name }}{% else %}<em>None</em>{% endif %}</td>
+        </tr>
+        <tr>
+            <td>Email address</td>
+            <td>{{ user.email }}</td>
+        </tr>
+        <tr>
+            <td>Linked pebble account</td>
+            <td>{% if user.pebble_token %}Yes{% else %}No{% endif %}</td>
+        </tr>
+        <tr>
+            <td style="padding-right: 10px;">Voice / Weather subscription</td>
+            <td>
+                {% if subscription %}
+                    {% if subscription.status == 'past_due' %}
+                        <strong>Overdue</strong>,
+                    {% elif subscription.status in ('active', 'trialing') %}
+                        <strong>Active</strong>, auto-renew
+                        {% if subscription.cancel_at_period_end %}
+                            disabled.<br>Subscription ends on {{ subscription.current_period_end | format_ts }}.
+                        {% else %}
+                            enabled.<br>Renews for another {{ subscription.plan.interval }} on {{ subscription.current_period_end | format_ts }}.
+                        {% endif %}
+                    {% else %}
+                        Expired on {{ subscription.ended_at | format_ts }}.
+                    {% endif %}
+                {% else %}
+                    None
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+    <hr>
+    <h3>Rebble Subscriptions</h3>
+    {% if not subscription or subscription.status == 'canceled' or subscription.cancel_at_period_end %}
+    <p>
+        Subscribing to Rebble for just $3/month enables dictation and weather support on your account,
+        and helps us keep the service running for everyone!
+    </p>
+        <p>
+            We see you do not have an active subscription, or your subscription is not set to auto-renew. Want to
+            subscribe? We offer two subscription options:
+        </p>
+        <table style="width: 100%; text-align: center;">
+            <tr>
+                <td style="vertical-align: top;">
+                    Pay $3.00 / month
+                    <form action="{{ url_for('.create_subscription') }}" method="POST">
+                      <script
+                        src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+                        data-key="pk_test_HtWIJSiwQRLunBIXRSpiHk85"
+                        data-email="{{ user.email }}"
+                        data-image="//static.rebble.io/auth/logo-128x128.png"
+                        data-label="Subscribe Monthly"
+                        data-name="Rebble Alliance"
+                        data-allow-remember-me="false"
+                        data-description="Voice / Dictation Subscription"
+                        data-locale="auto"
+                        data-zip-code="true"
+                        data-panel-label="Subscribe Monthly"
+                      >
+                      </script>
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <input type="hidden" name="plan" value="plan_D8zMUHWw0uZfN9">
+                    </form>
+                </td>
+                <td style="vertical-align: top;">Annually at $33/year
+                    <form action="{{ url_for('.create_subscription') }}" method="POST">
+                      <script
+                        src="https://checkout.stripe.com/checkout.js" class="stripe-button"
+                        data-key="pk_test_HtWIJSiwQRLunBIXRSpiHk85"
+                        data-email="{{ user.email }}"
+                        data-image="//static.rebble.io/auth/logo-128x128.png"
+                        data-label="Subscribe Annually"
+                        data-allow-remember-me="false"
+                        data-name="Rebble Alliance"
+                        data-description="Voice / Dictation Subscription"
+                        data-locale="auto"
+                        data-zip-code="true"
+                        data-panel-label="Subscribe Annually"
+                        >
+                      </script>
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <input type="hidden" name="plan" value="plan_D8zMJGYcyqz29L">
+                    </form>
+                    (One month free!)</td>
+            </tr>
+        </table>
+        <p>We use Stripe to handle our payments, and we never see or store your payment information.</p>
+    {% else %}
+        <p>
+            You are currently subscribed! If you like, you can cancel your subscription.
+            You will retain your subscription benefits until your subscription lapses, on
+            {{ subscription.current_period_end | format_ts }}.
+        </p>
+            <form action="{{ url_for('.cancel_subscription') }}" method="POST"  style="text-align: center;">
+                <input type="submit" value="Unsubscribe :(" style="font-size: 20px;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            </form>
+    {% endif %}
+{% endblock %}

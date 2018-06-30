@@ -8,7 +8,11 @@ api = Blueprint('api', __name__)
 @api.route('/me')
 @oauth.require_oauth('profile')
 def me():
-    return jsonify(uid=request.oauth.user.id, name=request.oauth.user.name)
+    return jsonify(
+        uid=request.oauth.user.id,
+        name=request.oauth.user.name,
+        is_subscribed=request.oauth.user.has_active_sub,
+    )
 
 
 @api.route('/me/pebble/auth')
@@ -34,3 +38,4 @@ def pebble_dev_portal_me():
 
 def init_app(app, url_prefix='/api/v1'):
     app.register_blueprint(api, url_prefix=url_prefix)
+    app.extensions['csrf'].exempt(api)

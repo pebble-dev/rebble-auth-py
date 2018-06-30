@@ -1,10 +1,12 @@
 from datetime import datetime, timedelta
+import logging
 
-from flask import Blueprint, abort, render_template, request
+from flask import Blueprint, abort, render_template, request, redirect
 from flask_oauthlib.provider import OAuth2Provider
 from oauthlib.common import generate_token as generate_random_token
 from flask_login import current_user, login_required
 
+from auth.login.base import demand_pebble
 from .models import db, IssuedToken, AuthClient, User
 from .redis import client as redis
 import json
@@ -52,6 +54,7 @@ def load_grant(client_id, code):
 @oauth.grantsetter
 def set_grant(client_id, code, request, *args, **kwargs):
     if not current_user.is_authenticated:
+        logging.error("Tried to set a grant for a user who is not logged in!?")
         return None
     grant = Grant(client_id, code['code'], current_user.id, request.scopes, request.redirect_uri)
     redis.setex(grant.key, 100, grant.serialise())

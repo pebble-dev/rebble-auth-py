@@ -1,3 +1,4 @@
+import datetime
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import UserMixin
@@ -5,6 +6,7 @@ from sqlalchemy.dialects.postgresql import ARRAY
 
 db = SQLAlchemy()
 migrate = Migrate()
+
 
 class User(UserMixin, db.Model):
     __tablename__ = "users"
@@ -16,6 +18,13 @@ class User(UserMixin, db.Model):
     pebble_token = db.Column(db.String, nullable=True, index=True)
     has_logged_in = db.Column(db.Boolean, nullable=False, server_default='false')
     account_type = db.Column(db.Integer, nullable=False, server_default='0')
+    stripe_customer_id = db.Column(db.String, nullable=True, index=True)
+    stripe_subscription_id = db.Column(db.String, nullable=True, index=True)
+    subscription_expiry = db.Column(db.DateTime, nullable=True)
+
+    @property
+    def has_active_sub(self):
+        return self.subscription_expiry is not None and datetime.datetime.utcnow() <= self.subscription_expiry
 
 
 class UserIdentity(db.Model):
