@@ -4,13 +4,13 @@
 <p>
     It looks like you're logged in
     {% if name %}
-        as {{ name }} &lt;{{ email }}&gt;.
+        as <strong>{{ name }} &lt;{{ email }}&gt;</strong>.
     {% else %}
-        using {{ email }}.
+        using <strong>{{ email }}</strong>.
     {% endif %}
-    We have your Pebble account (the one with e-mail address {{ pebble_email }}) all
+    We have your Pebble account (the one with e-mail address <strong>{{ pebble_email }}</strong>) all
     linked and ready to go.
-    Over the coming days, we'll import your data.
+    Over the coming hours, we'll import your data.
     Keep an eye on <a href="https://rebble.io/">rebble.io</a> for more information!
 </p>
 {% endblock %}
