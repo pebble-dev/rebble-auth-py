@@ -24,6 +24,8 @@ config = {
     'STRIPE_SECRET_KEY': environ['STRIPE_SECRET_KEY'],
     'STRIPE_PUBLIC_KEY': environ['STRIPE_PUBLIC_KEY'],
     'STRIPE_WEBHOOK_KEY': environ.get('STRIPE_WEBHOOK_KEY'),
+    'STRIPE_MONTHLY_PLAN': environ.get('STRIPE_MONTHLY_PLAN'),
+    'STRIPE_ANNUAL_PLAN': environ.get('STRIPE_ANNUAL_PLAN'),
 }
 
 if 'PEBBLE_CONSUMER_KEY' in environ and 'PEBBLE_CONSUMER_SECRET' in environ:

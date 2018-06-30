@@ -22,7 +22,10 @@ def account_info():
     subscription = None
     if current_user.stripe_subscription_id:
         subscription = stripe.Subscription.retrieve(current_user.stripe_subscription_id)
-    return render_template('account-info.html', user=current_user, subscription=subscription)
+    return render_template('account-info.html',
+                           user=current_user, subscription=subscription,
+                           monthly_plan=config['STRIPE_MONTHLY_PLAN'],
+                           annual_plan=config['STRIPE_ANNUAL_PLAN'])
 
 
 def handle_card_error(e: stripe.error.CardError):

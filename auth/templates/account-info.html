@@ -78,7 +78,7 @@
                       >
                       </script>
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                        <input type="hidden" name="plan" value="plan_D8zMUHWw0uZfN9">
+                        <input type="hidden" name="plan" value="{{ monthly_plan }}">
                     </form>
                 </td>
                 <td style="vertical-align: top;">Annually at $33/year
@@ -98,7 +98,7 @@
                         >
                       </script>
                         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                        <input type="hidden" name="plan" value="plan_D8zMJGYcyqz29L">
+                        <input type="hidden" name="plan" value="{{ annual_plan }}">
                     </form>
                     (One month free!)</td>
             </tr>
