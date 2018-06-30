@@ -21,6 +21,9 @@ config = {
         'consumer_key': environ['FACEBOOK_CONSUMER_KEY'],
         'consumer_secret': environ['FACEBOOK_CONSUMER_SECRET'],
     },
+    'STRIPE_SECRET_KEY': environ['STRIPE_SECRET_KEY'],
+    'STRIPE_PUBLIC_KEY': environ['STRIPE_PUBLIC_KEY'],
+    'STRIPE_WEBHOOK_KEY': environ.get('STRIPE_WEBHOOK_KEY'),
 }
 
 if 'PEBBLE_CONSUMER_KEY' in environ and 'PEBBLE_CONSUMER_SECRET' in environ:

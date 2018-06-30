@@ -88,3 +88,4 @@ def init_app(app):
     login_manager.login_view = 'login.login'
     login_manager.init_app(app)
     auth.init_app(app)
+    app.extensions['csrf'].exempt(login_blueprint)
