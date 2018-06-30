@@ -127,3 +127,4 @@ def init_app(app):
     app.config['OAUTH2_PROVIDER_ERROR_ENDPOINT'] = 'oauth_bp.oauth_error'
     oauth.init_app(app)
     app.register_blueprint(oauth_bp, url_prefix='/oauth')
+    app.extensions['csrf'].exempt(oauth_bp)
