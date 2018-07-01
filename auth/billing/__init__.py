@@ -16,16 +16,20 @@ def format_ts(value, format='%d-%m-%Y'):
     return datetime.datetime.utcfromtimestamp(value).strftime(format)
 
 
-@billing_blueprint.route('/account')
+@billing_blueprint.route('/account/')
 @login_required
 def account_info():
     subscription = None
     if current_user.stripe_subscription_id:
-        subscription = stripe.Subscription.retrieve(current_user.stripe_subscription_id)
+        try:
+            subscription = stripe.Subscription.retrieve(current_user.stripe_subscription_id)
+        except stripe.error.InvalidRequestError:
+            pass
     return render_template('account-info.html',
                            user=current_user, subscription=subscription,
                            monthly_plan=config['STRIPE_MONTHLY_PLAN'],
-                           annual_plan=config['STRIPE_ANNUAL_PLAN'])
+                           annual_plan=config['STRIPE_ANNUAL_PLAN'],
+                           stripe_key=config['STRIPE_PUBLIC_KEY'])
 
 
 def handle_card_error(e: stripe.error.CardError):
@@ -43,7 +47,7 @@ def create_subscription():
             customer.source = request.form['stripeToken']
             try:
                 customer.save()
-            except stripe.error.CardError as e:
+            except (stripe.error.CardError, stripe.error.InvalidRequestError) as e:
                 return handle_card_error(e)
         else:
             customer = None
@@ -75,7 +79,7 @@ def create_subscription():
             items=[{"plan": plan}],
             trial_end=start_date,
         )
-    except stripe.error.CardError as e:
+    except (stripe.error.CardError, stripe.error.InvalidRequestError) as e:
         return handle_card_error(e)
     current_user.stripe_subscription_id = sub.stripe_id
     current_user.subscription_expiry = datetime.datetime.utcfromtimestamp(sub.current_period_end).replace(tzinfo=datetime.timezone.utc) + datetime.timedelta(days=1)

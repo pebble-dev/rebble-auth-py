@@ -1,24 +1,26 @@
 {% extends "base.html" %}
 {% block body %}
 <h2>You're all set!</h2>
+{% if name %}
+    <p>Hi, {{ name }}!</p>
+{% else %}
+    <p>Hi!</p>
+{% endif %}
 <p>
-    It looks like you're logged in
-    {% if name %}
-        as <strong>{{ name }} &lt;{{ email }}&gt;</strong>.
-    {% else %}
-        using <strong>{{ email }}</strong>.
-    {% endif %}
-    {% if pebble_email %}
-        We have your Pebble account (the one with e-mail address <strong>{{ pebble_email }}</strong>) linked,
-        and
-        {% if has_data %}
-            we have already imported your data.
-        {% else %}
-            we're working on importing your data.
-        {% endif %}
-    {% else %}
-        You don't have a Pebble account linked, so you'll be starting from a clean slate.
-    {% endif %}
+    Are you ready to Rebble? You can <strong><a href="https://boot.rebble.io/">get started now</a></strong>!
+    Before you go through, you might want to consider supporting us and <strong>purchasing a
+    <a href="{{ url_for('billing.account_info') }}">weather and dictation subscription</a></strong>.</p>
+    <p>If you do so later, you'll have to repeat the getting started steps. They only take a minute,
+    but you may as well save spending a minute twice!
 </p>
-    <p>Keep an eye on <a href="https://rebble.io/">rebble.io</a> for instructions very soon!</p>
+<h3>Service status</h3>
+<ul>
+    <li>The <strong>appstore</strong>, <strong>locker</strong>, <strong>firmware</strong>,
+        <strong>language packs</strong>, and <strong>support pages</strong> are available now.</li>
+    <li>For those with subscriptions, <strong>dictation</strong> and <strong>weather</strong> are also available.</li>
+    <li>Timeline support for third-party apps is not yet available, but is still planned.</li>
+</ul>
+<p>Also, note that if you are using a Pebble Time Round or Pebble 2 with an iOS 11 device, dictation did not work for
+    you before and probably still does not work for you now. We might have a fix for this, but it has not shipped
+    yet.</p>
 {% endblock %}

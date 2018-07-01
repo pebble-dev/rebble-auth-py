@@ -65,7 +65,7 @@
                     <form action="{{ url_for('.create_subscription') }}" method="POST">
                       <script
                         src="https://checkout.stripe.com/checkout.js" class="stripe-button"
-                        data-key="pk_test_HtWIJSiwQRLunBIXRSpiHk85"
+                        data-key="{{ stripe_key }}"
                         data-email="{{ user.email }}"
                         data-image="//static.rebble.io/auth/logo-128x128.png"
                         data-label="Subscribe Monthly"
@@ -85,7 +85,7 @@
                     <form action="{{ url_for('.create_subscription') }}" method="POST">
                       <script
                         src="https://checkout.stripe.com/checkout.js" class="stripe-button"
-                        data-key="pk_test_HtWIJSiwQRLunBIXRSpiHk85"
+                        data-key="{{ stripe_key }}"
                         data-email="{{ user.email }}"
                         data-image="//static.rebble.io/auth/logo-128x128.png"
                         data-label="Subscribe Annually"
