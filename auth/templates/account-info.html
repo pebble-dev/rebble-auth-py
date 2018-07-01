@@ -114,5 +114,7 @@
                 <input type="submit" value="Unsubscribe :(" style="font-size: 20px;">
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
             </form>
+        <p>Are services you subscribed to not functioning? You might need to
+            <a href="https://boot.rebble.io/">repeat the initial setup</a>. Don't worry: it only takes a minute.</p>
     {% endif %}
 {% endblock %}
