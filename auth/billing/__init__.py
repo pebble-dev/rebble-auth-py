@@ -12,7 +12,7 @@ stripe.api_key = config['STRIPE_SECRET_KEY']
 billing_blueprint = Blueprint("billing", __name__)
 
 
-def format_ts(value, format='%d-%m-%Y'):
+def format_ts(value, format='%B %-d, %Y'):
     return datetime.datetime.utcfromtimestamp(value).strftime(format)
 
 
