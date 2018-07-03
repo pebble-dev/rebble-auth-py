@@ -12,6 +12,10 @@ api = Blueprint('api', __name__)
 @api.route('/me')
 @oauth.require_oauth('profile')
 def me():
+    if request.args.get('flag_authed') == 'true':
+        if not request.oauth.user.has_logged_in:
+            request.oauth.user.has_logged_in = True
+            db.session.commit()
     return jsonify(
         uid=request.oauth.user.id,
         name=request.oauth.user.name,
