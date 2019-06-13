@@ -11,6 +11,9 @@ from .models import db, IssuedToken, AuthClient, User
 from .redis import client as redis
 import json
 
+from flask.cli import with_appcontext
+import click
+
 oauth_bp = Blueprint('oauth_bp', __name__)
 oauth = OAuth2Provider()
 
@@ -121,6 +124,31 @@ def oauth_error():
 def generate_token(request, refresh_token=False):
     return generate_random_token()
 
+@click.command('create_oauth_client')
+@with_appcontext
+@click.argument('name')
+@click.option('--redirect_uri', multiple=True, required=True)
+@click.option('--confidential', is_flag=True)
+@click.option('--scope', multiple=True)
+def create_client(name, redirect_uri, confidential, scope):
+    client_id = generate_random_token(length = 24)
+    client_secret = 'secret_%s' % generate_random_token(length = 32)
+    
+    print("Creating token for \"%s\":" % name)
+    print("    Consumer key: %s" % client_id)
+    print("    Consumer secret: %s" % client_secret)
+    
+    client = AuthClient(
+        name = name,
+        client_id = client_id,
+        client_secret = client_secret,
+        redirect_uris = redirect_uri,
+        is_confidential = confidential,
+        default_scopes = scope
+        )
+    
+    db.session.add(client)
+    db.session.commit()
 
 def init_app(app):
     app.config['OAUTH2_PROVIDER_TOKEN_EXPIRES_IN'] = 315576000  # 10 years
@@ -128,3 +156,4 @@ def init_app(app):
     oauth.init_app(app)
     app.register_blueprint(oauth_bp, url_prefix='/oauth')
     app.extensions['csrf'].exempt(oauth_bp)
+    app.cli.add_command(create_client)
