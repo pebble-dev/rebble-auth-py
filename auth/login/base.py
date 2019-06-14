@@ -1,6 +1,6 @@
 import secrets
 from flask import Blueprint, render_template, session, request, redirect, abort, url_for, current_app
-from flask_login import LoginManager, login_user, current_user, login_required
+from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 from flask_oauthlib.client import OAuth
 
 from ..models import db, User, UserIdentity
@@ -29,6 +29,10 @@ def login():
 def demand_pebble():
     return render_template('pebble.html')
 
+@login_blueprint.route("/logout")
+def logout():
+    logout_user()
+    return render_template('logged-out.html')
 
 def redirect_next():
     next_url = session.get('next') or '/'

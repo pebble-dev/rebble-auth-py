@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block body %}
+    <style>
+        table.actually-a-table {
+            border-collapse: collapse;
+        }
+        table.actually-a-table tr {
+            border-bottom: 1px solid #dbdadb;
+        }
+        table.actually-a-table tr:last-child {
+          border: 0;
+        }
+    </style>
+
+<h2>Logged out</h2>
+<p>Ok, you're logged out.  Service logout status:</p>
+<table class="actually-a-table">
+  <tr>
+    <td><img src="http://boot.{{ config['DOMAIN_ROOT'] }}/logout" style="height: 1em;"></td>
+    <td>Rebble Boot</td>
+  </tr>
+</table>
+<p>(Perhaps you'd like to <strong><a href="/">log back in</a>?</strong>)
+{% endblock %}

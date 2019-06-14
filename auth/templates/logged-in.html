@@ -9,9 +9,15 @@
 <p>
     Are you ready to Rebble? You can <strong><a href="https://boot.rebble.io/">get started now</a></strong>!
     Before you go through, you might want to consider supporting us and <strong>purchasing a
-    <a href="{{ url_for('billing.account_info') }}">weather and dictation subscription</a></strong>.</p>
+    <a href="{{ url_for('billing.account_info') }}">weather and dictation subscription</a></strong>. 
+    You can also <strong><a href="{{ url_for('billing.account_info') }}">view your account
+    information</a></strong>, if you need to.</p>
+    
     <p>If you do so later, you'll have to repeat the getting started steps. They only take a minute,
     but you may as well save spending a minute twice!
+    
+    <p>(Logged in as the wrong user?  <strong><a href="{{
+    url_for('login.logout') }}">Log out</a></strong>, if you like.)
 </p>
 <h3>Service status</h3>
 <ul>
