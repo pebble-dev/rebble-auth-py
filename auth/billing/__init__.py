@@ -5,7 +5,7 @@ from flask import Blueprint, render_template, request, redirect, url_for
 from flask_login import login_required, current_user
 
 from auth import db
-from auth.models import User
+from auth.models import User, UserIdentity
 from auth.settings import config
 
 stripe.api_key = config['STRIPE_SECRET_KEY']
@@ -19,6 +19,9 @@ def format_ts(value, format='%B %-d, %Y'):
 @billing_blueprint.route('/account/')
 @login_required
 def account_info():
+    # Look up where they came from, too, so we can remind them.
+    identity = UserIdentity.query.filter_by(user=current_user).one_or_none()
+
     subscription = None
     if current_user.stripe_subscription_id:
         try:
@@ -29,7 +32,8 @@ def account_info():
                            user=current_user, subscription=subscription,
                            monthly_plan=config['STRIPE_MONTHLY_PLAN'],
                            annual_plan=config['STRIPE_ANNUAL_PLAN'],
-                           stripe_key=config['STRIPE_PUBLIC_KEY'])
+                           stripe_key=config['STRIPE_PUBLIC_KEY'],
+                           identity=identity)
 
 
 def handle_card_error(e: stripe.error.CardError):

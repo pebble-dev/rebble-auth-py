@@ -10,6 +10,10 @@
         table.actually-a-table tr:last-child {
           border: 0;
         }
+        span.hoverable {
+          text-decoration-line: underline;
+          text-decoration-style: dotted;
+        }
     </style>
     <h2>Rebble Account</h2>
     <table class="actually-a-table">
@@ -20,6 +24,10 @@
         <tr>
             <td>Email address</td>
             <td>{{ user.email }}</td>
+        </tr>
+        <tr>
+            <td><span class="hoverable" title="This is how we identify your Rebble account, not by e-mail address.  If you expect to be subscribed and you're not, perhaps try a different way of logging in?">Log-in provider</span></td>
+            <td>{{ identity.idp }}:{{ identity.idp_user_id }}</td>
         </tr>
         <tr>
             <td>Linked pebble account</td>
