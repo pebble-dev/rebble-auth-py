@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block body %}
+<h2>Log-in already in use</h2>
+    <p>It looks like you're trying to add a new log-in mechanism to an
+    existing Rebble account, but the log-in mechanism that you just tried to
+    add is already in use by a different Rebble account.  (An external
+    log-in can only be associated with one Rebble account at a time!)</p>
+    
+    <p>You can <b><a href="/auth/logout">log out</a></b> if you want to
+    switch Rebble accounts, or you can <b><a href="/auth">try again with
+    another external account</a></b>, or you can just <b><a
+    href="/account/">gaze blissfully on the accounts you have already
+    amassed</a></b>.</p>
+{% endblock %}

@@ -26,8 +26,10 @@
             <td>{{ user.email }}</td>
         </tr>
         <tr>
-            <td><span class="hoverable" title="This is how we identify your Rebble account, not by e-mail address.  If you expect to be subscribed and you're not, perhaps try a different way of logging in?">Log-in provider</span></td>
-            <td>{% for identity in identities %} {{ identity.idp }}:{{ identity.idp_user_id }}{% if not loop.last %},<br>{% endif %}{% endfor %}</td>
+            <td><span class="hoverable" title="This is how we identify your Rebble account, not by e-mail address.  If you expect to be subscribed and you're not, perhaps try a different way of logging in?">Log-in providers</span></td>
+            <td>{% for identity in identities %} {{ identity.idp }}:{{ identity.idp_user_id }}{% if not loop.last %},<br>{% endif %}{% endfor %}
+            <br>
+            <b><a href="/auth/">Add another</a></b></td>
         </tr>
         <tr>
             <td>Linked pebble account</td>

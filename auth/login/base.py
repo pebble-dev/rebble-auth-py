@@ -81,6 +81,8 @@ def complete_auth_flow(idp_name, idp_user_id, user_name, user_email):
             db.session.add(identity)
         else:
             print('Known identity')
+            if user != identity.user:
+                return render_template('already-associated.html')
     db.session.commit()
     login_user(identity.user, remember=True)
     return redirect_next()
