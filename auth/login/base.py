@@ -1,5 +1,5 @@
 import secrets
-from flask import Blueprint, render_template, session, request, redirect, abort, url_for, current_app
+from flask import Blueprint, render_template, session, request, redirect, abort, url_for, current_app, Response
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 from flask_oauthlib.client import OAuth
 
@@ -50,12 +50,14 @@ def get_state():
 
 
 def validate_state():
+    if 'oauth_state' not in session:
+        abort(Response(render_template('login-timed-out.html'), 401))
     expected_state = session['oauth_state']
     if expected_state is None:
-        abort(401)
+        abort(Response(render_template('login-timed-out.html'), 401))
     del session['oauth_state']
     if request.args.get('state') != expected_state:
-        abort(401)
+        abort(Response(render_template('login-timed-out.html'), 401))
 
 
 def complete_auth_flow(idp_name, idp_user_id, user_name, user_email):

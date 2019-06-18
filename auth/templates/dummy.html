@@ -1,6 +1,6 @@
 {% extends "base.html" %}
 {% block body %}
-<form action="dummy/complete" method="post">
+<form action="dummy/complete?state={{ state }}" method="post">
   Remote user ID: <input type="text" name="user_id"><br>
   Name: <input type="text" name="name"><br>
   E-mail: <input type="text" name="email"><br>
