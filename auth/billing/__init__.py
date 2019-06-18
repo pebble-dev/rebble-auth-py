@@ -20,7 +20,7 @@ def format_ts(value, format='%B %-d, %Y'):
 @login_required
 def account_info():
     # Look up where they came from, too, so we can remind them.
-    identity = UserIdentity.query.filter_by(user=current_user).first()
+    identities = UserIdentity.query.filter_by(user=current_user).all()
 
     subscription = None
     if current_user.stripe_subscription_id:
@@ -33,7 +33,7 @@ def account_info():
                            monthly_plan=config['STRIPE_MONTHLY_PLAN'],
                            annual_plan=config['STRIPE_ANNUAL_PLAN'],
                            stripe_key=config['STRIPE_PUBLIC_KEY'],
-                           identity=identity)
+                           identities=identities)
 
 
 def handle_card_error(e: stripe.error.CardError):
