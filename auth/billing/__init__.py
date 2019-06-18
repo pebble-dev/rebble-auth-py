@@ -20,7 +20,7 @@ def format_ts(value, format='%B %-d, %Y'):
 @login_required
 def account_info():
     # Look up where they came from, too, so we can remind them.
-    identity = UserIdentity.query.filter_by(user=current_user).one_or_none()
+    identity = UserIdentity.query.filter_by(user=current_user).first()
 
     subscription = None
     if current_user.stripe_subscription_id:
