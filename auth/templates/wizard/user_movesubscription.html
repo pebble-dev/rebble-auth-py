@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}Rebble Auth - User modify{% endblock %}
+{% block body %}
+    <style>
+        table.actually-a-table {
+            border-collapse: collapse;
+        }
+        table.actually-a-table tr {
+            border-bottom: 1px solid #dbdadb;
+        }
+        table.actually-a-table tr:last-child {
+            border: 0;
+        }
+        table.actually-a-table td, table.actually-a-table th {
+            padding-right: 5px;
+            padding-left: 5px;
+        }
+    </style>
+
+<h2>Move subscription from {{ olduser.id }}</h2>
+
+{% if prompt %}
+<p>Considering moving subscription:</p>
+{% else %}
+<p>Just moved subscription:</p>
+{% endif %}
+
+<table class="actually-a-table">
+    <tr>
+        <td>From user:</td>
+        <td><b><a href="{{ url_for("wizard.user_by_id", id = olduser.id) }}">{{ olduser.id }}</a> ({{ olduser.name }} &lt;{{ olduser.email }}&gt;)</b></td>
+    </tr>
+    <tr>
+        <td>To user:</td>
+        <td><b><a href="{{ url_for("wizard.user_by_id", id = destuser.id) }}">{{ destuser.id }}</a> ({{ destuser.name }} &lt;{{ destuser.email }}&gt;)</b></td>
+    </tr>
+    {% if prompt and not olduser.has_active_sub %}
+        <tr>
+            <td style="color: firebrick; font-weight: bold;">ERROR</td>
+
+            <td>&quot;From&quot; user is not subscribed, so there's nothing
+            for me to do here.</td>
+        </tr>
+    {% endif %}
+    {% if prompt and destuser.has_active_sub %}
+        <tr>
+            <td style="color: firebrick; font-weight: bold;">ERROR</td>
+
+            <td>&quot;To&quot; user is already subscribed, so I won't
+            overwrite their subscription.</td>
+        </tr>
+    {% endif %}
+    {% if prompt and destuser.stripe_customer_id %}
+        <tr>
+            <td style="color: firebrick; font-weight: bold;">CAUTION</td>
+
+            <td>&quot;To&quot; user already has a Stripe customer ID, which
+            will be overwritten.</td>
+        </tr>
+    {% endif %}
+</table>
+
+{% if prompt %}
+{% if not possible %}
+<p><center>
+    Cowardly refusing to act, based upon the above problems.
+</center></p>
+<p><center><a href="{{ url_for("wizard.wizard_root") }}">Never mind.</a></center></p>
+{% else %}
+<p><center>
+    <form action="{{ url_for("wizard.user_movesubscription", id = olduser.id) }}" method="POST">
+        <input type="hidden" name="dest" value="{{ destuser.id }}" />
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <input type="submit" value="Yes, this is what I meant to happen.">
+    </form>
+</center></p>
+<p><center><a href="{{ url_for("wizard.wizard_root") }}">No, never mind.</a></center></p>
+{% endif %}
+
+{% else %}
+{% if not possible %}
+<p><center>I'm not sure how you got here, but I didn't change anything.</center></p>
+{% else %}
+<p><center>Consider it done.  The user will have to redo boot, as usual.</center></p>
+{% endif %}
+
+<p><center><a href="{{ url_for("wizard.wizard_root") }}">Back home.</a></center></p>
+{% endif %}
+
+
+{% endblock %}

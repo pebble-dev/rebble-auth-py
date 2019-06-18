@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Rebble Auth - {{ search }}{% endblock %}
+{% block body %}
+    <style>
+        table.actually-a-table {
+            border-collapse: collapse;
+        }
+        table.actually-a-table tr {
+            border-bottom: 1px solid #dbdadb;
+        }
+        table.actually-a-table tr:last-child {
+            border: 0;
+        }
+        table.actually-a-table td, table.actually-a-table th {
+            padding-right: 5px;
+            padding-left: 5px;
+        }
+    </style>
+
+<h2>Search results</h2>
+<h3>{{ search }}</h3>
+
+<table class="actually-a-table">
+  <tr>
+    <th>ID</th>
+    <th>Name</th>
+    <th>E-mail</th>
+    <th>Linked</th>
+    <th>Active sub</th>
+  </tr>
+  {% for user in users %}
+  <tr>
+    <td><a href="{{ user.id }}">{{ user.id }}</a></td>
+    <td>{% if user.name %}{{ user.name }}{% else %}<em>None</em>{% endif %}</td>
+    <td>{{ user.email }}</td>
+    <td>{% if user.pebble_token %}Yes{% else %}No{% endif %}</td>
+    <td>{% if user.has_active_sub %}Yes{% else %}No{% endif %}</td>
+  </tr>
+  {% endfor %}
+</table>
+<ul>
+{% for event in audit_events %}
+<li><b>{{ event.timestamp | format_datetime }} ({{ event.user.name }}):</b> <i>{{ event.what }}</i></li>
+{% endfor %}
+</ul>
+
+{% endblock %}

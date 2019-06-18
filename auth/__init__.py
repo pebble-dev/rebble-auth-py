@@ -10,6 +10,7 @@ from .oauth import init_app as init_oauth
 from .api import init_app as init_api
 from .redis import init_app as init_redis
 from .billing import init_app as init_billing
+from .wizard import init_app as init_wizard
 
 from .settings import config
 
@@ -25,6 +26,7 @@ init_login(app)
 init_oauth(app)
 init_billing(app)
 init_api(app)
+init_wizard(app)
 
 
 @app.route("/")

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Rebble Auth - User modify{% endblock %}
+{% block body %}
+    <style>
+        table.actually-a-table {
+            border-collapse: collapse;
+        }
+        table.actually-a-table tr {
+            border-bottom: 1px solid #dbdadb;
+        }
+        table.actually-a-table tr:last-child {
+            border: 0;
+        }
+        table.actually-a-table td, table.actually-a-table th {
+            padding-right: 5px;
+            padding-left: 5px;
+        }
+    </style>
+
+<h2>Modify user {{user.id}}</h2>
+
+<p>Made change to user:</p>
+
+<table class="actually-a-table">
+    <tr>
+        <td>User:</td>
+        <td><b><a href="{{ url_for("wizard.user_by_id", id = user.id) }}">{{ user.id }}</a> ({{ user.name }} &lt;{{ user.email }}&gt;)</b></td>
+    </tr>
+    <tr>
+        <td>Changed:</td>
+        <td>{{ what }}</td>
+    </tr>
+    <tr>
+        <td>From:</td>
+        <td>{{ old }}</td>
+    </tr>
+    <tr>
+        <td>To:</td>
+        <td>{{ new }}</td>
+    </tr>
+</table>
+
+<p><center>Consider it done.</center></p>
+
+<p><center><a href="{{ url_for("wizard.wizard_root") }}">Back home.</a></center></p>
+
+{% endblock %}

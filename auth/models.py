@@ -21,6 +21,7 @@ class User(UserMixin, db.Model):
     stripe_customer_id = db.Column(db.String, nullable=True, index=True)
     stripe_subscription_id = db.Column(db.String, nullable=True, index=True)
     subscription_expiry = db.Column(db.DateTime, nullable=True)
+    is_wizard = db.Column(db.Boolean, server_default='false')
 
     @property
     def has_active_sub(self):
@@ -73,6 +74,15 @@ class IssuedToken(db.Model):
         db.session.delete(self)
         db.session.commit()
         return self
+
+
+class WizardAuditLog(db.Model):
+    __tablename__ = "wizard_audit_log"
+    id = db.Column(db.Integer, primary_key=True)
+    timestamp = db.Column(db.DateTime)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'))
+    user = db.relationship('User')
+    what = db.Column(db.String)
 
 
 def init_app(app):

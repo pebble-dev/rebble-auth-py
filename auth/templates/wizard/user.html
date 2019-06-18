@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+{% block title %}Rebble Auth - User lookup{% endblock %}
+{% block body %}
+    <style>
+        table.actually-a-table {
+            border-collapse: collapse;
+        }
+        table.actually-a-table tr {
+            border-bottom: 1px solid #dbdadb;
+        }
+        table.actually-a-table tr:last-child {
+            border: 0;
+        }
+        table.actually-a-table td, table.actually-a-table th {
+            padding-right: 5px;
+            padding-left: 5px;
+        }
+    </style>
+
+<h2>User lookup for ID {{ user.id }}</h2>
+
+    <table class="actually-a-table">
+        <tr>
+            <td>Account name</td>
+            <td>{% if user.name %}{{ user.name }}{% else %}<em>None</em>{% endif %}</td>
+            <td>
+                <form action="{{ url_for("wizard.user_modify", id=user.id) }}" method="POST" style="display: inline;">
+                    <input type="text" name="name" />
+                    <input type="submit" value="Change" />
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                </form>
+            </td>
+        </tr>
+        <tr>
+            <td>Email address</td>
+            <td>{{ user.email }}</td>
+            <td>
+                <form action="{{ url_for("wizard.user_modify", id=user.id) }}" method="POST" style="display: inline;">
+                    <input type="text" name="email" />
+                    <input type="submit" value="Change" />
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                </form>
+            </td>
+        </tr>
+        <tr>
+            <td><span class="hoverable" title="This is how we identify your Rebble account, not by e-mail address.  If you expect to be subscribed and you're not, perhaps try a different way of logging in?">Log-in providers</span></td>
+            <td>{% for identity in identities %} <a href="{{ url_for("wizard.useridentity_by_idp", id="%s:%s" % (identity.idp, identity.idp_user_id)) }}">{{ identity.idp }}:{{ identity.idp_user_id }}</a>{% if not loop.last %},<br>{% endif %}{% endfor %}
+        </tr>
+        <tr>
+            <td>Linked Pebble account</td>
+            <td>{% if user.pebble_token %}Yes{% else %}No{% endif %}</td>
+        </tr>
+        <tr>
+            <td style="padding-right: 10px;">Voice / Weather subscription</td>
+            <td>
+                {% if subscription %}
+                    {% if subscription.status == 'past_due' %}
+                        <strong>Overdue</strong>,
+                    {% elif subscription.status in ('active', 'trialing') %}
+                        <strong>Active</strong>, auto-renew
+                        {% if subscription.cancel_at_period_end %}
+                            disabled.<br>Subscription ends on {{ subscription.current_period_end | format_ts }}.
+                        {% else %}
+                            enabled.<br>Renews for another {{ subscription.plan.interval }} on {{ subscription.current_period_end | format_ts }}.
+                        {% endif %}
+                    {% else %}
+                        Expired on {{ subscription.ended_at | format_ts }}.
+                    {% endif %}
+                {% else %}
+                    None
+                {% endif %}
+            </td>
+            <td>
+                <form action="{{ url_for("wizard.user_movesubscription", id=user.id) }}" method="GET" style="display: inline;">
+                    <input type="text" name="dest" />
+                    <input type="submit" value="Move to user ID" />
+                </form>
+            </td>
+
+        </tr>
+        <tr>
+            <td style="padding-right: 10px;">Stripe customer ID</td>
+            <td>{% if user.stripe_customer_id %}{{ user.stripe_customer_id }}{% else %}<em>None</em>{% endif %}</td>
+        </tr>
+        <tr>
+            <td style="padding-right: 10px;">Stripe subscription ID</td>
+            <td>{% if user.stripe_subscription_id %}{{ user.stripe_subscription_id }}{% else %}<em>None</em>{% endif %}</td>
+        </tr>
+        <tr>
+            <td>Has run boot</td>
+            <td>{% if user.has_logged_in %}Yes{% else %}No{% endif %}</td>
+        </tr>
+    </table>
+
+{% endblock %}
