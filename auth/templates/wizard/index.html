@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Rebble Auth - Wizard Mode{% endblock %}
+{% block body %}
+<h2>Welcome to wizard mode</h2>
+
+<h3>Tools</h3>
+
+<p><b>Be very careful with these.</b> When you click a button, something
+will immediately happen with no confirmation!  <a
+href="https://nethackwiki.com/wiki/Wizard_mode"><i>Do you want your
+possessions identified?</i></a></p>
+
+<form action="{{ url_for('.user_search') }}" method="POST">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+  <input type="text" name="email" />
+  <input type="submit" value="Look up user by e-mail">
+</form>
+
+<form action="{{ url_for('.user_search') }}" method="POST">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+  <input type="text" name="name" />
+  <input type="submit" value="Look up user by name">
+</form>
+
+<form action="{{ url_for('.user_search') }}" method="POST">
+  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+  <input type="text" name="idp" />
+  <input type="submit" value="Look up user by IDP (google:123456789...)">
+</form>
+
+<hr>
+
+<h3>Last 24 hours of wizardry</h3> 
+
+<ul>
+{% for event in audit_events %}
+<li><b>{{ event.timestamp | format_datetime }} ({{ event.user.name }}):</b> <i>{{ event.what }}</i></li>
+{% endfor %}
+</ul>
+
+{% endblock %}

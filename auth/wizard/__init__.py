@@ -39,6 +39,43 @@ def wizard_root():
     
     return render_template('wizard/index.html', audit_events = audit_events)
 
+@wizard_blueprint.route("/user/search", methods=["POST"])
+@login_required
+def user_search():
+    ensure_wizard()
+    
+    if 'email' in request.form:
+        search = f"Users with e-mail address {request.form['email']}"
+        users = User.query.filter_by(email = request.form['email']).all()
+    elif 'name' in request.form:
+        search = f"Users with name {request.form['name']}"
+        users = User.query.filter_by(name = request.form['name']).all()
+    elif 'idp' in request.form:
+        search = f"Users logging in as {request.form['idp']}"
+        idp, idp_user_id = request.form['idp'].split(':', 1)
+        identities = UserIdentity.query.filter_by(idp = idp, idp_user_id = idp_user_id).all()
+        users = [x.user for x in identities]
+    
+    audit(f"Searched for: {search}")
+    
+    return render_template('wizard/user_search.html', users = users, search = search)
+
+@wizard_blueprint.route("/user/<id>")
+@login_required
+def user_by_id(id):
+    ensure_wizard()
+    
+    user = User.query.filter_by(id = id).one()
+    identities = UserIdentity.query.filter_by(user=user).all()
+    subscription = None
+    if current_user.stripe_subscription_id:
+        try:
+            subscription = stripe.Subscription.retrieve(current_user.stripe_subscription_id)
+        except stripe.error.InvalidRequestError:
+            pass
+
+    return render_template('wizard/user.html', user = user, identities = identities, subscription = subscription)
+
 @click.command('make_wizard')
 @with_appcontext
 @click.argument('idp_name')
