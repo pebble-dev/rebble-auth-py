@@ -73,6 +73,8 @@ def user_by_id(id):
             subscription = stripe.Subscription.retrieve(current_user.stripe_subscription_id)
         except stripe.error.InvalidRequestError:
             pass
+    
+    audit(f"Viewed user {id}")
 
     return render_template('wizard/user.html', user = user, identities = identities, subscription = subscription)
 
