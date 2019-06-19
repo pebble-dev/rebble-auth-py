@@ -29,7 +29,7 @@ def facebook_auth_complete():
         return 'Failed.'
     g.facebook_token = (resp['access_token'], '')
     me = facebook.get('me?fields=id,name,email').data
-    response = complete_auth_flow(facebook.name, me["id"], me["name"], me['email'])
+    response = complete_auth_flow(facebook.name, me["id"], me["name"], me['email'] if 'email' in 'me' else None)
     db.session.commit()
     return response
 
