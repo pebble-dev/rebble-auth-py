@@ -47,7 +47,7 @@ def create_subscription():
     customer = None
     if current_user.stripe_customer_id:
         customer = stripe.Customer.retrieve(current_user.stripe_customer_id)
-        if (deleted not in customer) or (not customer.deleted):
+        if ('deleted' not in customer) or (not customer.deleted):
             customer.source = request.form['stripeToken']
             try:
                 customer.save()
