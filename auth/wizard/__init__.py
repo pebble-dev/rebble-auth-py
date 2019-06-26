@@ -91,6 +91,29 @@ def useridentity_by_idp(id):
     return render_template('wizard/useridentity.html', identity = identity)
 
 
+@wizard_blueprint.route("/useridentity/<id>/moveto", methods=["GET", "POST"])
+@login_required
+def useridentity_moveto(id):
+    ensure_wizard()
+    
+    idp, idp_user_id = id.split(':', 1)
+    identity = UserIdentity.query.filter_by(idp = idp, idp_user_id = idp_user_id).one()
+    
+    if request.method == "GET":
+        dest = request.args.get("dest")
+    else:
+        dest = request.form.get("dest")
+    olduser = identity.user
+    destuser = User.query.filter_by(id = dest).one()
+    nidentities = UserIdentity.query.filter_by(user = identity.user).count()
+    
+    if request.method == "POST":
+        audit(f"MODIFICATION: Moved identity {idp}:{idp_user_id} from user {olduser.id} to user {destuser.id}.")
+        identity.user = destuser
+        db.session.commit()
+    
+    return render_template('wizard/useridentity_move.html', identity = identity, olduser = olduser, destuser = destuser, nidentities = nidentities, prompt = request.method == "GET")
+
 @click.command('make_wizard')
 @with_appcontext
 @click.argument('idp_name')

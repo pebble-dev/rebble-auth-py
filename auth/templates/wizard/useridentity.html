@@ -23,6 +23,12 @@
         <tr>
             <td>Associated user</td>
             <td><a href="{{ url_for("wizard.user_by_id", id = identity.user.id) }}">{{ identity.user.id }}</a> ({{ identity.user.name }} &lt;{{ identity.user.email }}&gt;)</td>
+            <td>
+                <form action="{{ url_for("wizard.useridentity_moveto", id = "%s:%s" % (identity.idp, identity.idp_user_id)) }}" method="GET" style="display: inline;">
+                    <input type="text" name="dest" />
+                    <input type="submit" value="Move to user">
+                </form>
+            </td>
         </tr>
     </table>
 
