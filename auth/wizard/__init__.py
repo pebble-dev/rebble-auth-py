@@ -78,6 +78,19 @@ def user_by_id(id):
 
     return render_template('wizard/user.html', user = user, identities = identities, subscription = subscription)
 
+@wizard_blueprint.route("/useridentity/<id>")
+@login_required
+def useridentity_by_idp(id):
+    ensure_wizard()
+    
+    idp, idp_user_id = id.split(':', 1)
+    identity = UserIdentity.query.filter_by(idp = idp, idp_user_id = idp_user_id).one()
+    
+    audit(f"Viewed useridentity {id}")
+
+    return render_template('wizard/useridentity.html', identity = identity)
+
+
 @click.command('make_wizard')
 @with_appcontext
 @click.argument('idp_name')

@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Rebble Auth - User lookup{% endblock %}
+{% block body %}
+    <style>
+        table.actually-a-table {
+            border-collapse: collapse;
+        }
+        table.actually-a-table tr {
+            border-bottom: 1px solid #dbdadb;
+        }
+        table.actually-a-table tr:last-child {
+            border: 0;
+        }
+        table.actually-a-table td, table.actually-a-table th {
+            padding-right: 5px;
+            padding-left: 5px;
+        }
+    </style>
+
+<h2>User identity lookup {{ identity.idp }}:{{ identity.idp_user_id }}</h2>
+
+    <table class="actually-a-table">
+        <tr>
+            <td>Associated user</td>
+            <td><a href="{{ url_for("wizard.user_by_id", id = identity.user.id) }}">{{ identity.user.id }}</a> ({{ identity.user.name }} &lt;{{ identity.user.email }}&gt;)</td>
+        </tr>
+    </table>
+
+{% endblock %}
