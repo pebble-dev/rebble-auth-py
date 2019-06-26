@@ -86,7 +86,8 @@
 
 <p><center><a href="{{ url_for("wizard.wizard_root") }}">No, never mind.</a></center></p>
 {% else %}
-<p><center>Consider it done.</center></p>
+<p><center>Consider it done.  The user will have to log out and log back in
+for changes to take place.</center></p>
 
 <p><center><a href="{{ url_for("wizard.wizard_root") }}">Back home.</a></center></p>
 {% endif %}
