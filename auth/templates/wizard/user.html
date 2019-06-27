@@ -23,10 +23,24 @@
         <tr>
             <td>Account name</td>
             <td>{% if user.name %}{{ user.name }}{% else %}<em>None</em>{% endif %}</td>
+            <td>
+                <form action="{{ url_for("wizard.user_modify", id=user.id) }}" method="POST" style="display: inline;">
+                    <input type="text" name="name" />
+                    <input type="submit" value="Change" />
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                </form>
+            </td>
         </tr>
         <tr>
             <td>Email address</td>
             <td>{{ user.email }}</td>
+            <td>
+                <form action="{{ url_for("wizard.user_modify", id=user.id) }}" method="POST" style="display: inline;">
+                    <input type="text" name="email" />
+                    <input type="submit" value="Change" />
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                </form>
+            </td>
         </tr>
         <tr>
             <td><span class="hoverable" title="This is how we identify your Rebble account, not by e-mail address.  If you expect to be subscribed and you're not, perhaps try a different way of logging in?">Log-in providers</span></td>

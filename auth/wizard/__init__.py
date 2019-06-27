@@ -57,6 +57,7 @@ def user_search():
         users = [x.user for x in identities]
     
     audit(f"Searched for: {search}")
+    db.session.commit()
     
     return render_template('wizard/user_search.html', users = users, search = search)
 
@@ -77,6 +78,29 @@ def user_by_id(id):
     audit(f"Viewed user {id}")
 
     return render_template('wizard/user.html', user = user, identities = identities, subscription = subscription)
+
+@wizard_blueprint.route("/user/<id>/modify", methods=["POST"])
+@login_required
+def user_modify(id):
+    ensure_wizard()
+    
+    user = User.query.filter_by(id = id).one()
+    
+    if 'name' in request.form:
+        what = 'name'
+        old = user.name
+        new = request.form['name']
+        user.name = new
+    elif 'email' in request.form:
+        what = 'e-mail address'
+        old = user.email
+        new = request.form['email']
+        user.email = new
+    
+    audit(f"Changed user {user.id} {what} from '{old}' to '{new}'")
+    db.session.commit()
+    
+    return render_template('wizard/user_modify.html', user = user, what = what, old = old, new = new)
 
 @wizard_blueprint.route("/useridentity/<id>")
 @login_required
