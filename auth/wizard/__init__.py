@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 
+import stripe
 from flask import Blueprint, render_template, request, redirect, url_for, abort
 from flask_login import login_required, current_user
 
@@ -10,6 +11,7 @@ from auth.settings import config
 from flask.cli import with_appcontext
 import click
 
+stripe.api_key = config['STRIPE_SECRET_KEY']
 wizard_blueprint = Blueprint("wizard", __name__)
 
 def format_datetime(value, format='%B %-d %Y, %H:%M:%S'):
@@ -69,9 +71,9 @@ def user_by_id(id):
     user = User.query.filter_by(id = id).one()
     identities = UserIdentity.query.filter_by(user=user).all()
     subscription = None
-    if current_user.stripe_subscription_id:
+    if user.stripe_subscription_id:
         try:
-            subscription = stripe.Subscription.retrieve(current_user.stripe_subscription_id)
+            subscription = stripe.Subscription.retrieve(user.stripe_subscription_id)
         except stripe.error.InvalidRequestError:
             pass
     
