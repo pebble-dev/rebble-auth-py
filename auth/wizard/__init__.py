@@ -97,10 +97,38 @@ def user_modify(id):
         new = request.form['email']
         user.email = new
     
-    audit(f"Changed user {user.id} {what} from '{old}' to '{new}'")
+    audit(f"MODIFICATION: Changed user {user.id} {what} from '{old}' to '{new}'")
     db.session.commit()
     
     return render_template('wizard/user_modify.html', user = user, what = what, old = old, new = new)
+
+@wizard_blueprint.route("/user/<id>/movesubscription", methods=["GET", "POST"])
+@login_required
+def user_movesubscription(id):
+    ensure_wizard()
+    
+    olduser = User.query.filter_by(id = id).one()
+    
+    if request.method == "GET":
+        dest = request.args.get("dest")
+    else:
+        dest = request.form.get("dest")
+    destuser = User.query.filter_by(id = dest).one()
+
+    possible = olduser.has_active_sub and not destuser.has_active_sub
+    if request.method == 'POST' and possible:
+        destuser.stripe_customer_id = olduser.stripe_customer_id
+        destuser.stripe_subscription_id = olduser.stripe_subscription_id
+        destuser.subscription_expiry = olduser.subscription_expiry
+        
+        olduser.stripe_customer_id = None
+        olduser.stripe_subscription_id = None
+        olduser.subscription_expiry = None
+        
+        audit(f"MODIFICATION: Moved subscription from user {olduser.id} to user {destuser.id}")
+        db.session.commit()
+    
+    return render_template('wizard/user_movesubscription.html', olduser = olduser, destuser = destuser, possible = possible, prompt = request.method == "GET")
 
 @wizard_blueprint.route("/useridentity/<id>")
 @login_required

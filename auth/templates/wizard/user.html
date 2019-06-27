@@ -70,6 +70,13 @@
                     None
                 {% endif %}
             </td>
+            <td>
+                <form action="{{ url_for("wizard.user_movesubscription", id=user.id) }}" method="GET" style="display: inline;">
+                    <input type="text" name="dest" />
+                    <input type="submit" value="Move to user ID" />
+                </form>
+            </td>
+
         </tr>
         <tr>
             <td style="padding-right: 10px;">Stripe customer ID</td>
