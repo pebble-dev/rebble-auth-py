@@ -21,6 +21,7 @@ def me():
         name=request.oauth.user.name,
         is_subscribed=request.oauth.user.has_active_sub,
         scopes=request.oauth.scopes,
+        is_wizard=request.oauth.user.is_wizard
     )
 
 
