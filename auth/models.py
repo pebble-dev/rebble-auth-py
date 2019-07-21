@@ -26,6 +26,14 @@ class User(UserMixin, db.Model):
     @property
     def has_active_sub(self):
         return self.subscription_expiry is not None and datetime.datetime.utcnow() <= self.subscription_expiry
+    
+    @property
+    def has_timeline(self):
+        return self.is_wizard
+    
+    @property
+    def timeline_ttl(self):
+        return 30 if self.has_active_sub else (3 * 60)
 
 
 class UserIdentity(db.Model):

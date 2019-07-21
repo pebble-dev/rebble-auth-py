@@ -56,6 +56,12 @@
                 {% endif %}
             </td>
         </tr>
+{% if user.has_timeline %}
+        <tr>
+          <td>Timeline sync interval</td>
+          <td>{{ user.timeline_ttl }} minutes</td>
+        </tr>
+{% endif %}
         <tr>
           <td>
             <strong><a href="{{url_for('login.logout') }}">Log out</a></strong>
@@ -67,7 +73,8 @@
     <h3>Rebble Subscriptions</h3>
     {% if not subscription or subscription.status == 'canceled' or subscription.cancel_at_period_end %}
     <p>
-        Subscribing to Rebble for just $3/month enables dictation and weather support on your account,
+        Subscribing to Rebble for just $3/month enables dictation and weather support
+        (and faster timeline sync) on your account,
         and helps us keep the service running for everyone!
     </p>
         <p>
