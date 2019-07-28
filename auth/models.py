@@ -5,6 +5,7 @@ from flask_login import UserMixin
 from sqlalchemy.dialects.postgresql import ARRAY
 
 SUBSCRIBER_ROLLOUT_START = datetime.datetime(2019, 7, 21, 7, 0, 0, 0)
+NONSUBSCRIBER_ROLLOUT_START = datetime.datetime(2019, 7, 28, 7, 0, 0, 0)
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -31,7 +32,8 @@ class User(UserMixin, db.Model):
     
     @property
     def has_timeline(self):
-        return self.is_wizard or (self.has_active_sub and datetime.datetime.utcnow() > (SUBSCRIBER_ROLLOUT_START + datetime.timedelta(seconds = self.id)))
+        return self.is_wizard or self.has_active_sub or \
+               (datetime.datetime.utcnow() > (NONSUBSCRIBER_ROLLOUT_START + datetime.timedelta(seconds = self.id * 2)))
     
     @property
     def timeline_ttl(self):
