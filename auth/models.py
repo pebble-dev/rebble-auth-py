@@ -2,7 +2,7 @@ import datetime
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import UserMixin
-from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 
 SUBSCRIBER_ROLLOUT_START = datetime.datetime(2019, 7, 21, 7, 0, 0, 0)
 NONSUBSCRIBER_ROLLOUT_START = datetime.datetime(2019, 7, 28, 7, 0, 0, 0)
@@ -25,6 +25,7 @@ class User(UserMixin, db.Model):
     stripe_subscription_id = db.Column(db.String, nullable=True, index=True)
     subscription_expiry = db.Column(db.DateTime, nullable=True)
     is_wizard = db.Column(db.Boolean, server_default='false')
+    boot_overrides = db.Column(JSONB)
 
     @property
     def has_active_sub(self):

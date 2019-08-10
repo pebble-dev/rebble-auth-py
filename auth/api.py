@@ -23,7 +23,8 @@ def me():
         scopes=request.oauth.scopes,
         is_wizard=request.oauth.user.is_wizard,
         has_timeline=request.oauth.user.has_timeline,
-        timeline_ttl=request.oauth.user.timeline_ttl
+        timeline_ttl=request.oauth.user.timeline_ttl,
+        boot_overrides=request.oauth.user.boot_overrides
     )
 
 

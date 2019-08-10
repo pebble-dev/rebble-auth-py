@@ -14,6 +14,14 @@
           text-decoration-line: underline;
           text-decoration-style: dotted;
         }
+        span.spoiler {
+          background-color: #000000;
+          color: #000000;
+        }
+        
+        span.spoiler:hover {
+          color: #cccccc;
+        }
     </style>
     <h2>Rebble Account</h2>
     <table class="actually-a-table">
@@ -140,4 +148,63 @@
         <p>Are services you subscribed to not functioning? You might need to
             <a href="https://boot.rebble.io/">repeat the initial setup</a>. Don't worry: it only takes a minute.</p>
     {% endif %}
+    <hr>
+    <h3>Experimental Features for Developers</h3>
+    <p>
+    
+        <p>If you're developing for Rebble, here are a few options that you
+        might find helpful.  Be careful with these: you can get your phone
+        pretty confused with these.  Most people won't need to touch these.</p>
+        
+        <p style="text-align: center;"><input type="submit" onclick='document.getElementById("experimental").style.display = "block";' value="I know what I'm doing, show me the options anyway!" /></p>
+    
+        <div style="display: none;" id="experimental">
+            <p>Ok, up to you.  If it breaks you get to keep both pieces.</p>
+            
+            <p>If you know what you're doing, you can override some
+            parameters that we send to your phone to set up Rebble.  Make
+            sure to rerun boot after you tweak these.</p>
+            
+            
+            <form action="{{ url_for('.boot_overrides') }}" method="POST" style="text-align: center;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <input type="hidden" name="overrides" value="null" />
+                <input type="submit" value="Something is wrong -- I want the defaults back again!" style="font-size: 20px; color: #ff0000;" />
+            </form>
+            
+            <form action="{{ url_for('.boot_overrides') }}" method="POST" style="text-align: center;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <textarea cols="80" rows="4" name="overrides" style="display: none;">
+{
+    "config": {
+        "webviews": {
+            "appstore/search": "https://store-beta.rebble.io/#/faces/search?&accessToken={access_token}&platform={platform}&releaseId=207&appVersion=4.4&pebbleColor=$$pebbleColor$$&hardware=$$hardware$$&jsv=200&uid=$$user_id$$&mid=$$phone_id$$&pid=$$pebble_id$$&inApp=true&$$extras$$",
+            "appstore/watchapps": "https://store-beta.rebble.io/#/apps?&accessToken={access_token}&platform={platform}&releaseId=207&appVersion=4.4&pebbleColor=$$pebbleColor$$&hardware=$$hardware$$&jsv=200&uid=$$user_id$$&mid=$$phone_id$$&pid=$$pebble_id$$&inApp=true&$$extras$$",
+            "appstore/watchfaces": "https://store-beta.rebble.io/#/faces?&accessToken={access_token}&platform={platform}&releaseId=207&appVersion=4.4&pebbleColor=$$pebbleColor$$&hardware=$$hardware$$&jsv=200&uid=$$user_id$$&mid=$$phone_id$$&pid=$$pebble_id$$&inApp=true&$$extras$$",
+            "appstore/application": "https://store-beta.rebble.io/#/app/$$id$$?&accessToken={access_token}&platform={platform}&releaseId=207&appVersion=4.4&pebbleColor=$$pebbleColor$$&hardware=$$hardware$$&jsv=200&uid=$$user_id$$&mid=$$phone_id$$&pid=$$pebble_id$$&inApp=true&$$extras$$",
+            "appstore/search/query": "https://store-beta.rebble.io/#/faces/$$search_type$$/search?accessToken={access_token}&native=true&query=$$query$$&platform={platform}&releaseId=207&appVersion=4.4&pebbleColor=$$pebbleColor$$&hardware=$$hardware$$&jsv=200&uid=$$user_id$$&mid=$$phone_id$$&pid=$$pebble_id$$&inApp=true&$$extras$$",
+            "appstore/developer_apps": "https://store-beta.rebble.io/#/author/$$id$$?&accessToken={access_token}&platform={platform}&releaseId=207&appVersion=4.4&pebbleColor=$$pebbleColor$$&hardware=$$hardware$$&jsv=200&uid=$$user_id$$&mid=$$phone_id$$&pid=$$pebble_id$$&inApp=true&$$extras$$",
+            "appstore/application_share": "https://store-beta.rebble.io/#/app/$$id$$",
+            "appstore/application_changelog": "https://store-beta.rebble.io/#/app/$$id$$/versions?&accessToken={access_token}&platform={platform}&releaseId=207&appVersion=4.4&pebbleColor=$$pebbleColor$$&hardware=$$hardware$$&jsv=200&uid=$$user_id$$&mid=$$phone_id$$&pid=$$pebble_id$$&inApp=true&$$extras$$"
+        }
+    }
+}
+</textarea>
+                <input type="submit" value="Just switch me to the Rebble Store beta." style="font-size: 20px;" />
+            </form>
+
+            <p>If you really want, you can type your own JSON into the field
+            below to override the boot JSON.  Currently, you can override
+            the app store URLs, with something like <tt>{ "config": {
+            "webviews": { "appstore/watchapps": "http://your-path", ...  } }
+            }</tt>.</p>
+      
+            <form action="{{ url_for('.boot_overrides') }}" method="POST" style="text-align: center;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <textarea cols="80" rows="4" name="overrides">
+{{ user.boot_overrides | json_dump(indent = 4) }}</textarea>
+                <input type="submit" value="Ok, well, I guess that looks good." style="font-size: 20px;"/>
+            </form>
+            
+        </div>
 {% endblock %}

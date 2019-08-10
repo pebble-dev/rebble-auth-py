@@ -8,6 +8,8 @@ from auth import db
 from auth.models import User, UserIdentity
 from auth.settings import config
 
+import json
+
 stripe.api_key = config['STRIPE_SECRET_KEY']
 billing_blueprint = Blueprint("billing", __name__)
 
@@ -99,6 +101,18 @@ def cancel_subscription():
     sub.delete(at_period_end=True)
     return redirect(url_for('.account_info'))
 
+@billing_blueprint.route('/account/boot_overrides', methods=["POST"])
+@login_required
+def boot_overrides():
+    try:
+        overrides = json.loads(request.form['overrides'])
+    except Exception as e:
+        return str(e), 400
+    
+    current_user.boot_overrides = overrides
+    db.session.commit()
+    
+    return "Okay, did that.  You can hit the back and refresh buttons on your own, since you're a developer, after all.  Make sure to rerun boot to pick up the new changes."
 
 @billing_blueprint.route('/stripe/event', methods=["POST"])
 def stripe_event():
@@ -135,4 +149,5 @@ def stripe_event():
 def init_app(app, prefix='/'):
     app.register_blueprint(billing_blueprint, url_prefix=prefix)
     app.jinja_env.filters['format_ts'] = format_ts
+    app.jinja_env.filters['json_dump'] = json.dumps
     app.extensions['csrf'].exempt(stripe_event)
