@@ -105,8 +105,17 @@ def get_client(client_id):
 @login_required
 @oauth.authorize_handler
 def authorise(*args, **kwargs):
-    return True
-
+    if request.method == 'GET':
+        client_id = kwargs.get('client_id')
+        client = AuthClient.query.filter_by(client_id=client_id).one()
+        kwargs['client'] = client
+    
+        if client.is_rws:
+            return True
+            
+        return render_template('oauthorise.html', **kwargs)
+    
+    return 'confirm' in request.form
 
 @oauth_bp.route('/token', methods=['GET', 'POST'])
 @oauth.token_handler
@@ -128,9 +137,10 @@ def generate_token(request, refresh_token=False):
 @with_appcontext
 @click.argument('name')
 @click.option('--redirect_uri', multiple=True, required=True)
+@click.option('--is_rws', is_flag=True)
 @click.option('--confidential', is_flag=True)
 @click.option('--scope', multiple=True)
-def create_client(name, redirect_uri, confidential, scope):
+def create_client(name, redirect_uri, confidential, scope, is_rws):
     client_id = generate_random_token(length = 24)
     client_secret = 'secret_%s' % generate_random_token(length = 32)
     
@@ -144,7 +154,8 @@ def create_client(name, redirect_uri, confidential, scope):
         client_secret = client_secret,
         redirect_uris = redirect_uri,
         is_confidential = confidential,
-        default_scopes = scope
+        default_scopes = scope,
+        is_rws = is_rws
         )
     
     db.session.add(client)

@@ -59,6 +59,7 @@ class AuthClient(db.Model):
     redirect_uris = db.Column(ARRAY(db.String))
     is_confidential = db.Column(db.Boolean)
     default_scopes = db.Column(ARRAY(db.String))
+    is_rws = db.Column(db.Boolean, server_default='false') # Internal clients do not need confirmation for OAuth.
 
     @property
     def client_type(self):
