@@ -20,7 +20,7 @@ def format_ts(value, format='%B %-d, %Y'):
 
 @billing_blueprint.route('/account/')
 @login_required
-def account_info():
+def account_info(message = None):
     # Look up where they came from, too, so we can remind them.
     identities = UserIdentity.query.filter_by(user=current_user).all()
 
@@ -35,7 +35,8 @@ def account_info():
                            monthly_plan=config['STRIPE_MONTHLY_PLAN'],
                            annual_plan=config['STRIPE_ANNUAL_PLAN'],
                            stripe_key=config['STRIPE_PUBLIC_KEY'],
-                           identities=identities)
+                           identities=identities,
+                           message=message)
 
 
 def handle_card_error(e: stripe.error.CardError):
@@ -94,6 +95,23 @@ def create_subscription():
         to_cancel.delete()
     return redirect(url_for('.account_info'))
 
+@billing_blueprint.route('/account/sub/update', methods=['POST'])
+@login_required
+def update_credit_card():
+    try:
+        customer = stripe.Customer.modify(
+            current_user.stripe_customer_id,
+            source = request.form['stripeToken']
+        )
+    except (stripe.error.CardError, stripe.error.InvalidRequestError) as e:
+        return handle_card_error(e)
+    
+    return redirect(url_for('.update_complete'))
+
+@billing_blueprint.route('/account/sub/update_complete')
+@login_required
+def update_complete():
+    return account_info('Okay, updated your credit card.')
 
 @billing_blueprint.route('/account/sub/delete', methods=["POST"])
 def cancel_subscription():
