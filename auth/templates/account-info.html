@@ -253,9 +253,6 @@
             </tr>
         </table>
         <p>We use Stripe to handle our payments, and we never see or store your payment information.</p>
-    {% elif subscription.status == 'past_due' %}
-        <p>You are currently subscribed, but we're having trouble billing
-        your credit card.
     {% else %}
         {% if subscription.status == 'past_due' %}
         <p>
