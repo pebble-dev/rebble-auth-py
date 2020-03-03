@@ -1,3 +1,14 @@
+from .settings import config
+
+# Lightstep tracing
+from ddtrace import tracer, patch_all
+from ddtrace.propagation.b3 import B3HTTPPropagator
+if config['LIGHTSTEP_KEY'] is not None:
+    tracer.set_tags({'lightstep.service_name': 'auth', 'lightstep.access_token': config['LIGHTSTEP_KEY']})
+    tracer.configure(http_propagator=B3HTTPPropagator)
+    print("yes, lightstep is on!")
+    patch_all()
+
 from flask import Flask, render_template
 from flask_login import login_required, current_user
 from flask_sslify import SSLify
