@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from flask_login import login_required, current_user
 from flask_sslify import SSLify
 from flask_wtf import CSRFProtect
@@ -35,6 +35,15 @@ init_api(app)
 init_wizard(app)
 
 
+# XXX: upstream this
+import beeline
+
+@app.before_request
+def before_request():
+    beeline.add_context_field("route", request.endpoint)
+    if current_user.is_authenticated:
+        beeline.add_context_field("user", current_user.id)
+
 @app.route("/")
 @login_required
 def root():
@@ -44,3 +53,19 @@ def root():
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
+
+# XXX: upstream this
+from wrapt import wrap_function_wrapper
+import jinja2
+def _render_template(fn, instance, args, kwargs):
+    span = beeline.start_span(context = {
+        "name": "jinja2_render_template",
+        "template.name": instance.name or "[string]",
+    })
+    
+    try:
+        return fn(*args, **kwargs)
+    finally:
+        beeline.finish_span(span)
+
+wrap_function_wrapper('jinja2', 'Template.render', _render_template)
