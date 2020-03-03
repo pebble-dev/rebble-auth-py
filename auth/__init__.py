@@ -3,6 +3,9 @@ from flask_login import login_required, current_user
 from flask_sslify import SSLify
 from flask_wtf import CSRFProtect
 
+import beeline
+from beeline.middleware.flask import HoneyMiddleware
+
 from .models import init_app as init_db, db
 from .login import init_app as init_login
 from .login.pebble import ensure_pebble, pebble
@@ -17,6 +20,9 @@ from .settings import config
 app = Flask(__name__)
 CSRFProtect(app)
 app.config.update(**config)
+if config['HONEYCOMB_KEY']:
+     beeline.init(writekey=config['HONEYCOMB_KEY'], dataset='rws', service_name='auth')
+     HoneyMiddleware(app, db_events = True)
 sslify = SSLify(app)
 if not app.debug:
     app.config['PREFERRED_URL_SCHEME'] = 'https'
