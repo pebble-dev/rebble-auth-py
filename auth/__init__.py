@@ -23,7 +23,7 @@ app.config.update(**config)
 if config['HONEYCOMB_KEY']:
      beeline.init(writekey=config['HONEYCOMB_KEY'], dataset='rws', service_name='auth')
      HoneyMiddleware(app, db_events = True)
-sslify = SSLify(app)
+sslify = SSLify(app, skips=['heartbeat'])
 if not app.debug:
     app.config['PREFERRED_URL_SCHEME'] = 'https'
 init_db(app)
@@ -49,6 +49,10 @@ def before_request():
 def root():
     return render_template('logged-in.html', name=current_user.name, email=current_user.email)
 
+
+@app.route("/heartbeat")
+def heartbeat():
+    return "ok"
 
 @app.errorhandler(404)
 def page_not_found(e):
