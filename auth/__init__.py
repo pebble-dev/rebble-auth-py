@@ -17,6 +17,23 @@ from .wizard import init_app as init_wizard
 
 from .settings import config
 
+# Avoid redirecting internal kube requests.  Note that this needs to happen
+# before the SSLify is created.  Note that I don't think it's possible for
+# the outside world to try to call us by 'auth:8080', since that won't make
+# it past the GCLB.
+#
+# XXX: Package this up in a 'just Rebble things' package, along with some of
+# our other Beeline hacks.
+
+from wrapt import wrap_function_wrapper
+
+def _redirect_to_ssl(fn, instance, args, kwargs):
+    if request.host == 'auth:8080':
+        return
+    return fn(*args, **kwargs)
+
+wrap_function_wrapper('flask_sslify', 'SSLify.redirect_to_ssl', _redirect_to_ssl)
+
 app = Flask(__name__)
 CSRFProtect(app)
 app.config.update(**config)
@@ -59,7 +76,6 @@ def page_not_found(e):
     return render_template('404.html'), 404
 
 # XXX: upstream this
-from wrapt import wrap_function_wrapper
 import jinja2
 def _render_template(fn, instance, args, kwargs):
     span = beeline.start_span(context = {
@@ -73,10 +89,3 @@ def _render_template(fn, instance, args, kwargs):
         beeline.finish_span(span)
 
 wrap_function_wrapper('jinja2', 'Template.render', _render_template)
-
-# Avoid redirecting internal kube requests.
-def _redirect_to_ssl(fn, instance, args, kwargs):
-    if request.host == 'auth:8080':
-        return
-    return fn(*args, **kwargs)
-wrap_function_wrapper('flask_sslify', 'SSLify.redirect_to_ssl', _redirect_to_ssl)
