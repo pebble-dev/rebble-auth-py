@@ -1,7 +1,10 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from flask_login import login_required, current_user
 from flask_sslify import SSLify
 from flask_wtf import CSRFProtect
+
+import beeline
+from beeline.middleware.flask import HoneyMiddleware
 
 from .models import init_app as init_db, db
 from .login import init_app as init_login
@@ -14,10 +17,30 @@ from .wizard import init_app as init_wizard
 
 from .settings import config
 
+# Avoid redirecting internal kube requests.  Note that this needs to happen
+# before the SSLify is created.  Note that I don't think it's possible for
+# the outside world to try to call us by 'auth:8080', since that won't make
+# it past the GCLB.
+#
+# XXX: Package this up in a 'just Rebble things' package, along with some of
+# our other Beeline hacks.
+
+from wrapt import wrap_function_wrapper
+
+def _redirect_to_ssl(fn, instance, args, kwargs):
+    if request.host == 'auth:8080':
+        return
+    return fn(*args, **kwargs)
+
+wrap_function_wrapper('flask_sslify', 'SSLify.redirect_to_ssl', _redirect_to_ssl)
+
 app = Flask(__name__)
 CSRFProtect(app)
 app.config.update(**config)
-sslify = SSLify(app)
+if config['HONEYCOMB_KEY']:
+     beeline.init(writekey=config['HONEYCOMB_KEY'], dataset='rws', service_name='auth')
+     HoneyMiddleware(app, db_events = True)
+sslify = SSLify(app, skips=['heartbeat'])
 if not app.debug:
     app.config['PREFERRED_URL_SCHEME'] = 'https'
 init_db(app)
@@ -29,12 +52,40 @@ init_api(app)
 init_wizard(app)
 
 
+# XXX: upstream this
+import beeline
+
+@app.before_request
+def before_request():
+    beeline.add_context_field("route", request.endpoint)
+    if current_user.is_authenticated:
+        beeline.add_context_field("user", current_user.id)
+
 @app.route("/")
 @login_required
 def root():
     return render_template('logged-in.html', name=current_user.name, email=current_user.email)
 
 
+@app.route("/heartbeat")
+def heartbeat():
+    return "ok"
+
 @app.errorhandler(404)
 def page_not_found(e):
     return render_template('404.html'), 404
+
+# XXX: upstream this
+import jinja2
+def _render_template(fn, instance, args, kwargs):
+    span = beeline.start_span(context = {
+        "name": "jinja2_render_template",
+        "template.name": instance.name or "[string]",
+    })
+    
+    try:
+        return fn(*args, **kwargs)
+    finally:
+        beeline.finish_span(span)
+
+wrap_function_wrapper('jinja2', 'Template.render', _render_template)
