@@ -3,6 +3,7 @@ from os import environ
 config = {
     'SECRET_KEY': environ['SECRET_KEY'],
     'DOMAIN_ROOT': environ['DOMAIN_ROOT'],
+    'APPLICATION_ROOT': environ.get('SCRIPT_NAME', None),
 #    'SERVER_NAME': f"auth.{environ['DOMAIN_ROOT']}",
     'SQLALCHEMY_DATABASE_URI': environ['DATABASE_URL'],
     'REDIS_URL': environ['REDIS_URL'],
