@@ -87,6 +87,7 @@ def root():
 
 
 @app.route("/heartbeat")
+@app.route("/auth/heartbeat")
 def heartbeat():
     return "ok"
 
