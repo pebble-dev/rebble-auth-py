@@ -34,12 +34,31 @@ def _redirect_to_ssl(fn, instance, args, kwargs):
 
 wrap_function_wrapper('flask_sslify', 'SSLify.redirect_to_ssl', _redirect_to_ssl)
 
+from beeline.trace import _should_sample
+def sampler(fields):
+    sample_rate = 2
+
+    route = fields.get('route') or ''
+    if route == 'heartbeat':
+        sample_rate = 100
+    elif route == 'api.me':
+        sample_rate = 10
+    elif 'billing.' in route:
+        sample_rate = 1
+
+    response_code = fields.get('response.status_code')
+    if response_code != 200:
+        sample_rate = 1
+    
+    if _should_sample(fields.get('trace.trace_id'), sample_rate):
+        return True, sample_rate
+    return False, 0
+
 app = Flask(__name__)
 CSRFProtect(app)
 app.config.update(**config)
-if config['HONEYCOMB_KEY']:
-     beeline.init(writekey=config['HONEYCOMB_KEY'], dataset='rws', service_name='auth')
-     HoneyMiddleware(app, db_events = True)
+beeline.init(writekey=config['HONEYCOMB_KEY'], dataset='rws', service_name='auth', sampler_hook=sampler)
+HoneyMiddleware(app, db_events = True)
 sslify = SSLify(app, skips=['heartbeat'])
 if not app.debug:
     app.config['PREFERRED_URL_SCHEME'] = 'https'
