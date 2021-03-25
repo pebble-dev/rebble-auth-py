@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block body %}
+    <style>
+        table.actually-a-table {
+            border-collapse: collapse;
+        }
+        table.actually-a-table tr {
+            border-bottom: 1px solid #dbdadb;
+        }
+        table.actually-a-table tr:last-child {
+          border: 0;
+        }
+        span.hoverable {
+          text-decoration-line: underline;
+          text-decoration-style: dotted;
+        }
+        span.spoiler {
+          background-color: #000000;
+          color: #000000;
+        }
+        
+        span.spoiler:hover {
+          color: #cccccc;
+        }
+    </style>
+    <h2>Allow access?</h2>
+    
+    <p><b>{{ client.name }}</b> would like <i>read-only</i> access to your
+    Rebble account.  They'll get access to a way to uniquely identify you,
+    to your name, to whether you're a subscriber, and to your developer
+    settings (if you set any).  Is that OK with you?</p>
+    
+    <form method="POST" style="text-align: center;">
+      <input type="submit" name="confirm" value="Yes, that sounds good." style="font-size: 20px;" />
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    </form>
+    
+    <form method="POST" style="text-align: center;">
+      <input type="submit" name="deny" value="Actually, I'm not so sure about that." style="font-size: 20px;" />
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+    </form>
+
+{% endblock %}
