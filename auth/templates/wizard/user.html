@@ -43,6 +43,17 @@
             </td>
         </tr>
         <tr>
+            <td>Developer ID</td>
+            <td>{{ user.pebble_dev_portal_uid }}</td>
+            <td>
+                <form action="{{ url_for(" wizard.user_modify ", id=user.id) }}" method="POST" style="display: inline;">
+                    <input type="text" name="pebble_dev_portal_uid" />
+                    <input type="submit" value="Change" />
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                </form>
+            </td>
+        </tr>
+        <tr>
             <td><span class="hoverable" title="This is how we identify your Rebble account, not by e-mail address.  If you expect to be subscribed and you're not, perhaps try a different way of logging in?">Log-in providers</span></td>
             <td>{% for identity in identities %} <a href="{{ url_for("wizard.useridentity_by_idp", id="%s:%s" % (identity.idp, identity.idp_user_id)) }}">{{ identity.idp }}:{{ identity.idp_user_id }}</a>{% if not loop.last %},<br>{% endif %}{% endfor %}
         </tr>
@@ -93,3 +104,4 @@
     </table>
 
 {% endblock %}
+
