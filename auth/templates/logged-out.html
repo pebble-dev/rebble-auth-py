@@ -20,5 +20,5 @@
     <td>Rebble Boot</td>
   </tr>
 </table>
-<p>(Perhaps you'd like to <strong><a href="/">log back in</a>?</strong>)
+<p>(Perhaps you'd like to <strong><a href="{% if request_source == 'dev_portal' %} https://dev-portal.{{config['DOMAIN_ROOT']}} {% else %} / {% endif %}">log back in</a>?</strong>)
 {% endblock %}
