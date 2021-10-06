@@ -98,6 +98,11 @@ def user_modify(id):
         old = user.email
         new = request.form['email']
         user.email = new
+    elif 'pebble_dev_portal_uid' in request.form:
+        what = 'developer ID'
+        old = user.pebble_dev_portal_uid
+        new = request.form['pebble_dev_portal_uid']
+        user.pebble_dev_portal_uid = new
     
     audit(f"MODIFICATION: Changed user {user.id} {what} from '{old}' to '{new}'")
     db.session.commit()

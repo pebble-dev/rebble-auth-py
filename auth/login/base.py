@@ -32,7 +32,8 @@ def demand_pebble():
 @login_blueprint.route("/logout")
 def logout():
     logout_user()
-    return render_template('logged-out.html')
+    request_source = request.args.get('from') if request.args.get('from') is not None else "auth"
+    return render_template('logged-out.html', request_source=request_source)
 
 def redirect_next():
     next_url = session.get('next') or '/'
