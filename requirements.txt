@@ -34,3 +34,4 @@ Werkzeug==0.15.3
 WTForms==2.2.1
 honeycomb-beeline==2.11.4
 gunicorn
+Flask-Cors==3.0.6

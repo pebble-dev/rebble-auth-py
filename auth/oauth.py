@@ -5,6 +5,7 @@ from flask import Blueprint, abort, render_template, request, redirect
 from flask_oauthlib.provider import OAuth2Provider
 from oauthlib.common import generate_token as generate_random_token
 from flask_login import current_user, login_required
+from flask_cors import cross_origin
 
 from auth.login.base import demand_pebble
 from .models import db, IssuedToken, AuthClient, User
@@ -118,6 +119,7 @@ def authorise(*args, **kwargs):
     return 'confirm' in request.form
 
 @oauth_bp.route('/token', methods=['GET', 'POST'])
+@cross_origin()
 @oauth.token_handler
 def access_token():
     return None
