@@ -324,27 +324,6 @@
                 <input type="hidden" name="overrides" value="null" />
                 <input type="submit" value="Something is wrong -- I want the defaults back again!" style="font-size: 20px; color: #ff0000;" />
             </form>
-            
-            <form action="{{ url_for('.boot_overrides') }}" method="POST" style="text-align: center;">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-                <textarea cols="80" rows="4" name="overrides" style="display: none;">
-{
-    "config": {
-        "webviews": {
-            "appstore/search": "https://store-beta.rebble.io/faces/search?&accessToken={access_token}&platform={platform}&releaseId=207&appVersion=4.4&pebbleColor=$$pebbleColor$$&hardware=$$hardware$$&jsv=200&uid=$$user_id$$&mid=$$phone_id$$&pid=$$pebble_id$$&inApp=true&$$extras$$",
-            "appstore/watchapps": "https://store-beta.rebble.io/apps?&accessToken={access_token}&platform={platform}&releaseId=207&appVersion=4.4&pebbleColor=$$pebbleColor$$&hardware=$$hardware$$&jsv=200&uid=$$user_id$$&mid=$$phone_id$$&pid=$$pebble_id$$&inApp=true&$$extras$$",
-            "appstore/watchfaces": "https://store-beta.rebble.io/faces?&accessToken={access_token}&platform={platform}&releaseId=207&appVersion=4.4&pebbleColor=$$pebbleColor$$&hardware=$$hardware$$&jsv=200&uid=$$user_id$$&mid=$$phone_id$$&pid=$$pebble_id$$&inApp=true&$$extras$$",
-            "appstore/application": "https://store-beta.rebble.io/app/$$id$$?&accessToken={access_token}&platform={platform}&releaseId=207&appVersion=4.4&pebbleColor=$$pebbleColor$$&hardware=$$hardware$$&jsv=200&uid=$$user_id$$&mid=$$phone_id$$&pid=$$pebble_id$$&inApp=true&$$extras$$",
-            "appstore/search/query": "https://store-beta.rebble.io/faces/$$search_type$$/search?accessToken={access_token}&native=true&query=$$query$$&platform={platform}&releaseId=207&appVersion=4.4&pebbleColor=$$pebbleColor$$&hardware=$$hardware$$&jsv=200&uid=$$user_id$$&mid=$$phone_id$$&pid=$$pebble_id$$&inApp=true&$$extras$$",
-            "appstore/developer_apps": "https://store-beta.rebble.io/author/$$id$$?&accessToken={access_token}&platform={platform}&releaseId=207&appVersion=4.4&pebbleColor=$$pebbleColor$$&hardware=$$hardware$$&jsv=200&uid=$$user_id$$&mid=$$phone_id$$&pid=$$pebble_id$$&inApp=true&$$extras$$",
-            "appstore/application_share": "https://store-beta.rebble.io/app/$$id$$",
-            "appstore/application_changelog": "https://store-beta.rebble.io/app/$$id$$/versions?&accessToken={access_token}&platform={platform}&releaseId=207&appVersion=4.4&pebbleColor=$$pebbleColor$$&hardware=$$hardware$$&jsv=200&uid=$$user_id$$&mid=$$phone_id$$&pid=$$pebble_id$$&inApp=true&$$extras$$"
-        }
-    }
-}
-</textarea>
-                <input type="submit" value="Just switch me to the Rebble Store beta." style="font-size: 20px;" />
-            </form>
 
             <p>If you really want, you can type your own JSON into the field
             below to override the boot JSON.  Currently, you can override
