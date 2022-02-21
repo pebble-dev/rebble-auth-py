@@ -325,6 +325,34 @@
                 <input type="submit" value="Something is wrong -- I want the defaults back again!" style="font-size: 20px; color: #ff0000;" />
             </form>
 
+            <form action="{{ url_for('.boot_overrides') }}" method="POST" style="text-align: center;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <textarea cols="80" rows="4" name="overrides" style="display: none;">
+{
+    "config": {
+        "treasure_data": {
+            "write_key": "rebble.noident=True"
+        }
+    }
+}
+</textarea>
+                <input type="submit" value="Anonymize Rebble telemetry for my account." style="font-size: 20px;" />
+            </form>
+
+            <form action="{{ url_for('.boot_overrides') }}" method="POST" style="text-align: center;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                <textarea cols="80" rows="4" name="overrides" style="display: none;">
+{
+    "config": {
+        "treasure_data": {
+            "endpoint": ""
+        }
+    }
+}
+</textarea>
+                <input type="submit" value="Disable Rebble telemetry entirely for my account." style="font-size: 20px;" />
+            </form>
+
             <p>If you really want, you can type your own JSON into the field
             below to override the boot JSON.  Currently, you can override
             the app store URLs, with something like <tt>{ "config": {
