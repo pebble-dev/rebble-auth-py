@@ -30,6 +30,6 @@ def twitter_auth_complete():
         return 'Failed.'
     g.twitter_token = (resp['oauth_token'], resp['oauth_token_secret'])
     user_info = twitter.request('users/me').data
-    response = complete_auth_flow(twitter.name, resp['user_id'], user_info['name'], None)
+    response = complete_auth_flow(twitter.name, resp['user_id'], user_info.get('data', {}).get('name', None), None)
     db.session.commit()
     return response
