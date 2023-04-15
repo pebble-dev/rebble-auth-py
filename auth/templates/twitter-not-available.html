@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block body %}
+    <h2>Twitter account creation unavailable</h2>
+    <p>
+        Due to changes to the Twitter API in 2023, it is no longer possible to create Rebble accounts using Twitter.
+        Please try another login provider.
+    </p>
+    <p>
+        If you really want to log in via Twitter, you can create an account using another provider, then return to
+        <a href="/auth">the login page</a> while already logged in, and then log in with Twitter.
+    </p>
+    <p><a href="/auth">Try logging in again.</a></p>
+{% endblock %}

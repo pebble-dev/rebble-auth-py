@@ -68,6 +68,8 @@ def complete_auth_flow(idp_name, idp_user_id, user_name, user_email):
         if identity is not None:
             user = identity.user
         else:
+            if idp_name == 'twitter':
+                return render_template('twitter-not-available.html'), 401
             if user_email is None or user_email == '':
                 return render_template('email-required.html'), 401
             user = User(name=user_name, email=user_email)

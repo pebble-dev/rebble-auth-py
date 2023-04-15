@@ -5,7 +5,7 @@ from .base import auth, login_blueprint, complete_auth_flow, secure_url_for
 
 twitter = auth.remote_app(
     name='twitter',
-    base_url='https://api.twitter.com/1.1/',
+    base_url='https://api.twitter.com/2/',
     request_token_url='https://api.twitter.com/oauth/request_token',
     access_token_url='https://api.twitter.com/oauth/access_token',
     authorize_url='https://api.twitter.com/oauth/authenticate',
@@ -29,7 +29,7 @@ def twitter_auth_complete():
     if resp is None:
         return 'Failed.'
     g.twitter_token = (resp['oauth_token'], resp['oauth_token_secret'])
-    user_info = twitter.request('account/verify_credentials.json?include_entities=false&skip_status=true&include_email=true').data
-    response = complete_auth_flow(twitter.name, resp['user_id'], user_info['name'], user_info['email'])
+    user_info = twitter.request('users/me').data
+    response = complete_auth_flow(twitter.name, resp['user_id'], user_info['name'], None)
     db.session.commit()
     return response
