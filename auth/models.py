@@ -38,7 +38,7 @@ class User(UserMixin, db.Model):
     
     @property
     def timeline_ttl(self):
-        return 30 if self.has_active_sub else (3 * 60)
+        return 15 if self.has_active_sub else (3 * 60)
 
 
 class UserIdentity(db.Model):
