@@ -19,6 +19,7 @@ def me():
     return jsonify(
         uid=request.oauth.user.id,
         name=request.oauth.user.name,
+        email=request.oauth.user.email,
         is_subscribed=request.oauth.user.has_active_sub,
         scopes=request.oauth.scopes,
         is_wizard=request.oauth.user.is_wizard,
