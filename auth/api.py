@@ -32,7 +32,11 @@ def me():
 @oauth.require_oauth()
 def token_info():
     user = request.oauth.user
-    return jsonify(scopes=request.oauth.scopes, uid=user.id, is_subscribed=user.has_active_sub)
+    return jsonify(
+        scopes=request.oauth.scopes,
+        uid=user.id,
+        is_subscribed=user.has_active_sub,
+        audio_debug_mode=user.audio_debug_mode_enabled)
 
 
 @api.route('/me/pebble/auth')

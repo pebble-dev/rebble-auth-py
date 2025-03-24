@@ -302,6 +302,34 @@
             <a href="https://boot.rebble.io/">repeat the initial setup</a>. Don't worry: it only takes a minute.</p>
     {% endif %}
     <hr>
+    {%  if user.has_active_sub %}
+        <div>
+            <h3>Audio Debug Mode</h3>
+            {% if not user.audio_debug_mode %}
+                <p>If you like, you can enable audio debug mode to hear what dictation audio from your watch actually sounds like.</p>
+                <p>Audio debug mode remains on <strong>for one day</strong>, and will then be automatically disabled. Recorded audio
+                files will be deleted one day after they are stored, too.</p>
+                <form action="{{ url_for('.set_audio_debug_mode') }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <input type="hidden" name="enable" value="true" />
+                    <div style="text-align: center;">
+                        <input type="submit" value="Enable audio debug mode" />
+                    </div>
+                </form>
+            {% else %}
+                <p>Audio Debug Mode <strong>is enabled</strong>. You can check out your recordings <a href="https://audio-debug.rebble.io/recordings">over here</a>.</p>
+                <p>You can also disable it, to stop recording your dictation. Either way, it will disabled 24 hours after being enabled, and your recordings will be deleted 24 hours after they were created.</p>
+                <form action="{{ url_for('.set_audio_debug_mode') }}" method="POST">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                    <input type="hidden" name="enable" value="false" />
+                    <div style="text-align: center;">
+                        <input type="submit" style="" value="Disable audio debug mode" />
+                    </div>
+                </form>
+            {% endif %}
+        </div>
+        <hr>
+    {%  endif %}
     <h3>Experimental Features for Developers</h3>
     <p>
     

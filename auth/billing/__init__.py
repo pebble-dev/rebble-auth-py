@@ -132,6 +132,17 @@ def boot_overrides():
     
     return "Okay, did that.  You can hit the back and refresh buttons on your own, since you're a developer, after all.  Make sure to rerun boot to pick up the new changes."
 
+@billing_blueprint.route('/account/set_audio_debug_mode', methods=["POST"])
+@login_required
+def set_audio_debug_mode():
+    should_enable = request.form.get('enable') == 'true'
+    if should_enable:
+        current_user.audio_debug_mode = datetime.datetime.now()
+    else:
+        current_user.audio_debug_mode = None
+    db.session.commit()
+    return redirect(url_for('.account_info'))
+
 @billing_blueprint.route('/stripe/event', methods=["POST"])
 def stripe_event():
     payload = request.data

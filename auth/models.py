@@ -26,6 +26,7 @@ class User(UserMixin, db.Model):
     subscription_expiry = db.Column(db.DateTime, nullable=True)
     is_wizard = db.Column(db.Boolean, server_default='false')
     boot_overrides = db.Column(JSONB)
+    audio_debug_mode = db.Column(db.DateTime, nullable=True)
 
     @property
     def has_active_sub(self):
@@ -39,6 +40,10 @@ class User(UserMixin, db.Model):
     @property
     def timeline_ttl(self):
         return 15 if self.has_active_sub else (3 * 60)
+
+    @property
+    def audio_debug_mode_enabled(self):
+        return self.audio_debug_mode is not None and datetime.datetime.now() <= self.audio_debug_mode + datetime.timedelta(days=1)
 
 
 class UserIdentity(db.Model):
