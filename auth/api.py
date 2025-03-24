@@ -31,7 +31,8 @@ def me():
 @api.route('/me/token')
 @oauth.require_oauth()
 def token_info():
-    return jsonify(scopes=request.oauth.scopes)
+    user = request.oauth.user
+    return jsonify(scopes=request.oauth.scopes, uid=user.id, is_subscribed=user.has_active_sub)
 
 
 @api.route('/me/pebble/auth')
