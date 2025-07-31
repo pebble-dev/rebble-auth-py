@@ -4,4 +4,5 @@ from .twitter import twitter
 from .github import github
 from .facebook import facebook
 from .pebble import pebble
+from .auth0 import auth0
 from .dummy import dummy

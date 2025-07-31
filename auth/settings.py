@@ -22,6 +22,10 @@ config = {
         'consumer_key': environ['FACEBOOK_CONSUMER_KEY'],
         'consumer_secret': environ['FACEBOOK_CONSUMER_SECRET'],
     },
+    'AUTH_IDAAS': {
+        'consumer_key': environ['IDAAS_CONSUMER_KEY'],
+        'consumer_secret': environ['IDAAS_CONSUMER_SECRET'],
+    },
     'STRIPE_SECRET_KEY': environ['STRIPE_SECRET_KEY'],
     'STRIPE_PUBLIC_KEY': environ['STRIPE_PUBLIC_KEY'],
     'STRIPE_WEBHOOK_KEY': environ.get('STRIPE_WEBHOOK_KEY'),
