@@ -14,6 +14,7 @@ from .api import init_app as init_api
 from .redis import init_app as init_redis
 from .billing import init_app as init_billing
 from .wizard import init_app as init_wizard
+from .discourse import init_app as init_discourse
 
 from .settings import config
 
@@ -69,6 +70,7 @@ init_oauth(app)
 init_billing(app)
 init_api(app)
 init_wizard(app)
+init_discourse(app)
 
 
 # XXX: upstream this
