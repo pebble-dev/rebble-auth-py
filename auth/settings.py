@@ -1,8 +1,11 @@
 from os import environ
 
+domain_root = environ.get('DOMAIN_ROOT')
+http_protocol = environ.get('HTTP_PROTOCOL', 'https')
+
 config = {
     'SECRET_KEY': environ['SECRET_KEY'],
-    'DOMAIN_ROOT': environ['DOMAIN_ROOT'],
+    'DOMAIN_ROOT': domain_root,
 #    'SERVER_NAME': f"auth.{environ['DOMAIN_ROOT']}",
     'SQLALCHEMY_DATABASE_URI': environ['DATABASE_URL'],
     'REDIS_URL': environ['REDIS_URL'],
@@ -28,6 +31,8 @@ config = {
     'STRIPE_MONTHLY_PLAN': environ.get('STRIPE_MONTHLY_PLAN'),
     'STRIPE_ANNUAL_PLAN': environ.get('STRIPE_ANNUAL_PLAN'),
     'HONEYCOMB_KEY': environ.get('HONEYCOMB_KEY', None),
+    'DISCOURSE_SECRET': environ.get('DISCOURSE_SECRET', None),
+    'DISCOURSE_URL': environ.get('DISCOURSE_URL', f"{http_protocol}://forums.{domain_root}"),
 }
 
 if 'PEBBLE_CONSUMER_KEY' in environ and 'PEBBLE_CONSUMER_SECRET' in environ:
