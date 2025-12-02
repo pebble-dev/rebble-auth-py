@@ -29,7 +29,7 @@ def sso_redirect_url(nonce, user):
     }
 
     if user.is_wizard:
-        attributes['admin'] = True
+        attributes['admin'] = 'true'
 
     add_groups = []
     remove_groups = []
@@ -45,9 +45,9 @@ def sso_redirect_url(nonce, user):
         attributes['website'] = f"https://apps.rebble.io/developer/{user.pebble_dev_portal_uid}"
 
     if add_groups != []:
-        attributes['add_groups'] = ','.join(add_groups)
+        attributes['add_groups'] = '['+','.join(add_groups)+']'
     if remove_groups != []:
-        attributes['remove_groups'] = ','.join(remove_groups)
+        attributes['remove_groups'] = '['+','.join(remove_groups)+']'
     return "/session/sso_login?%s" % sso_payload(config['DISCOURSE_SECRET'], **attributes)
 
 def init_app(app):
