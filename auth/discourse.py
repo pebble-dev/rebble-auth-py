@@ -34,7 +34,7 @@ def sso_redirect_url(nonce, user):
     add_groups = []
     remove_groups = []
 
-    if user.has_active_sub():
+    if user.has_active_sub:
         add_groups.append('subscriber')
     else:
         remove_groups.append('subscriber')
