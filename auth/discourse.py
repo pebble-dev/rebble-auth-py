@@ -35,19 +35,19 @@ def sso_redirect_url(nonce, user):
     remove_groups = []
 
     if user.has_active_sub:
-        add_groups.append('subscriber')
+        add_groups.append('subscribers')
     else:
-        remove_groups.append('subscriber')
+        remove_groups.append('subscribers')
 
     if user.pebble_dev_portal_uid:
         # TODO: Check if the user has any public apps
-        add_groups.append('developer')
+        add_groups.append('developers')
         attributes['website'] = f"https://apps.rebble.io/developer/{user.pebble_dev_portal_uid}"
 
     if add_groups != []:
-        attributes['add_groups'] = '['+','.join(add_groups)+']'
+        attributes['add_groups'] = ','.join(add_groups)
     if remove_groups != []:
-        attributes['remove_groups'] = '['+','.join(remove_groups)+']'
+        attributes['remove_groups'] = ','.join(remove_groups)
     return "/session/sso_login?%s" % sso_payload(config['DISCOURSE_SECRET'], **attributes)
 
 def init_app(app):
