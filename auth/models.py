@@ -27,6 +27,7 @@ class User(UserMixin, db.Model):
     is_wizard = db.Column(db.Boolean, server_default='false')
     boot_overrides = db.Column(JSONB)
     audio_debug_mode = db.Column(db.DateTime, nullable=True)
+    username = db.Column(db.String)
 
     @property
     def has_active_sub(self):

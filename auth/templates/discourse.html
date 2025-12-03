@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block body %}
+    <style>
+        table.actually-a-table {
+            border-collapse: collapse;
+        }
+        table.actually-a-table tr {
+            border-bottom: 1px solid #dbdadb;
+        }
+        table.actually-a-table tr:last-child {
+          border: 0;
+        }
+        span.hoverable {
+          text-decoration-line: underline;
+          text-decoration-style: dotted;
+        }
+        span.spoiler {
+          background-color: #000000;
+          color: #000000;
+        }
+
+        span.spoiler:hover {
+          color: #cccccc;
+        }
+    </style>
+    <h2>Allow access?</h2>
+
+    <form method="POST" style="text-align: center;">
+      {% if not user.username %}
+      <p><b>Rebble Forums</b> needs a your account to have a valid username,
+      please write one below:</p>
+
+      <input type="input" name="username" placeholder="Username" />
+      {% endif %}
+
+      <p><b>Rebble Forums</b> would like <i>read-only</i> access to your
+      Rebble account.  They'll get access to a way to uniquely identify you,
+      to your name, username, to whether you're a subscriber, and to your
+      developer settings (if you set any).  Is that OK with you?</p>
+
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      <input type="submit" name="confirm" value="Yes, that sounds good." style="font-size: 20px;" />
+
+      <input type="submit" name="deny" value="Actually, I'm not so sure about that." style="font-size: 20px;" />
+    </form>
+
+{% endblock %}
