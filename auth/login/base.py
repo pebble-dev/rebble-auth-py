@@ -2,6 +2,7 @@ import secrets
 from flask import Blueprint, render_template, session, request, redirect, abort, url_for, current_app, Response
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 from flask_oauthlib.client import OAuth
+from ..settings import config
 
 from ..models import db, User, UserIdentity
 
@@ -33,7 +34,12 @@ def demand_pebble():
 def logout():
     logout_user()
     request_source = request.args.get('from') if request.args.get('from') is not None else "auth"
-    return render_template('logged-out.html', request_source=request_source)
+    return_url = "/"
+    try:
+        return_url = config[f'RETURN_{request_source.upper()}']
+    except KeyError:
+        pass
+    return render_template('logged-out.html', return_url=return_url)
 
 def redirect_next():
     next_url = session.get('next') or '/'
