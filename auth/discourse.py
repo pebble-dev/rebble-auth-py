@@ -1,14 +1,15 @@
 import pydiscourse
 from pydiscourse.sso import sso_validate, sso_payload
 
-from flask import Blueprint, request, abort, redirect
+from flask import Blueprint, request, abort, redirect, render_template
 from flask_login import login_required, current_user
 
+from auth.models import db, User
 from auth.settings import config
 
 discourse_blueprint = Blueprint("discourse", __name__)
 
-@discourse_blueprint.route("/")
+@discourse_blueprint.route("/", methods=['GET', 'POST'])
 @login_required
 def discourse_sso_view():
     payload = request.args.get('sso')
@@ -17,6 +18,20 @@ def discourse_sso_view():
         nonce = sso_validate(payload, signature, config['DISCOURSE_SECRET'])
     except pydiscourse.exceptions.DiscourseError:
         abort(401, 'No SSO payload or signature.')
+
+    if request.method == 'GET':
+        return render_template('discourse.html', user=current_user)
+    else:
+        if 'deny' in request.form:
+            return redirect(config['DISCOURSE_URL'])
+
+        username = request.form.get('username')
+        if username and username != '':
+            User.query.filter_by(id=current_user.id).update({'username': username})
+            db.session.commit()
+        elif not current_user.username:
+            abort(401, 'Username missing.')
+
     url = sso_redirect_url(nonce, current_user)
     return redirect(config['DISCOURSE_URL'] + url)
 
@@ -25,7 +40,8 @@ def sso_redirect_url(nonce, user):
         'nonce': nonce,
         'email': user.email,
         'external_id': user.id,
-        'name': user.name
+        'name': user.name,
+        'username': user.username
     }
 
     if user.is_wizard:
