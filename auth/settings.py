@@ -32,9 +32,9 @@ config = {
     'STRIPE_ANNUAL_PLAN': environ.get('STRIPE_ANNUAL_PLAN'),
     'HONEYCOMB_KEY': environ.get('HONEYCOMB_KEY', None),
     'DISCOURSE_SECRET': environ.get('DISCOURSE_SECRET', None),
-    'DISCOURSE_URL': environ.get('DISCOURSE_URL', f"{http_protocol}://forums.{domain_root}"),
+    'DISCOURSE_URL': environ.get('DISCOURSE_URL', f"{http_protocol}://forum.{domain_root}"),
     'RETURN_DEV_PORTAL': f'{http_protocol}://dev-portal.{domain_root}',
-    'RETURN_DISCOURSE': environ.get('DISCOURSE_URL', f"{http_protocol}://forums.{domain_root}") + '/login'
+    'RETURN_DISCOURSE': environ.get('DISCOURSE_URL', f"{http_protocol}://forum.{domain_root}") + '/login'
 }
 
 if 'PEBBLE_CONSUMER_KEY' in environ and 'PEBBLE_CONSUMER_SECRET' in environ:
