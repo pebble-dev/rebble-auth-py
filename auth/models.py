@@ -1,4 +1,5 @@
 import datetime
+import string
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import UserMixin
@@ -6,6 +7,8 @@ from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 
 SUBSCRIBER_ROLLOUT_START = datetime.datetime(2019, 7, 21, 7, 0, 0, 0)
 NONSUBSCRIBER_ROLLOUT_START = datetime.datetime(2019, 7, 28, 7, 0, 0, 0)
+
+USERNAME_SET = frozenset(string.ascii_lowercase + string.digits + '-._')
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -27,7 +30,7 @@ class User(UserMixin, db.Model):
     is_wizard = db.Column(db.Boolean, server_default='false')
     boot_overrides = db.Column(JSONB)
     audio_debug_mode = db.Column(db.DateTime, nullable=True)
-    username = db.Column(db.String)
+    username = db.Column(db.String(24), unique=True, index=True)
 
     @property
     def has_active_sub(self):
@@ -45,6 +48,10 @@ class User(UserMixin, db.Model):
     @property
     def audio_debug_mode_enabled(self):
         return self.audio_debug_mode is not None and datetime.datetime.now() <= self.audio_debug_mode + datetime.timedelta(days=1)
+
+    @classmethod
+    def is_valid_username(cls, username):
+        return set(username) <= USERNAME_SET and 4 <= len(username) <= 24
 
 
 class UserIdentity(db.Model):

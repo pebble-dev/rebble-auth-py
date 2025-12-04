@@ -30,7 +30,7 @@
       <p><b>Rebble Forums</b> needs a your account to have a valid username,
       please write one below:</p>
 
-      <input type="input" name="username" placeholder="Username" />
+      <input type="input" name="username" placeholder="Username" pattern="[a-zA-Z0-9_\.\-]{4,24}" title="4-24 letters, numbers, dashes, dots and underscores" />
       {% endif %}
 
       <p><b>Rebble Forums</b> would like <i>read-only</i> access to your
