@@ -27,10 +27,13 @@ def discourse_sso_view():
 
         username = request.form.get('username')
         if username and username != '':
-            User.query.filter_by(id=current_user.id).update({'username': username})
-            db.session.commit()
+            if User.is_valid_username(username):
+                User.query.filter_by(id=current_user.id).update({'username': username})
+                db.session.commit()
+            else:
+                abort(400, 'Username must only contain letters, numbers, dashes, dots and underscores.')
         elif not current_user.username:
-            abort(401, 'Username missing.')
+            abort(400, 'Username missing.')
 
     url = sso_redirect_url(nonce, current_user)
     return redirect(config['DISCOURSE_URL'] + url)
