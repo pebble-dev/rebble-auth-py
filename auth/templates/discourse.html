@@ -32,16 +32,16 @@
       in for the first time, you need to pick a username for your account on
       the forum.  (We'll associate that with your Rebble account, {{user.email}}.)  Luckily, we provided a box for you below to type into! 
       Please pick a username (4-24 letters, numbers, dashes, dots, and
-      underscores):
+      underscores):</p>
 
       <input type="input" name="username" placeholder="Username" pattern="[a-zA-Z0-9_\.\-]{4,24}" title="4-24 letters, numbers, dashes, dots and underscores" />
       {% endif %}
       
       {% if user.username %}
       
-      You're about to log back into the <b>Rebble Developer Forum</b> as {{
-      user.username }} (since that's the username associated with your
-      Rebble account, {{ user.email }}).  Sound right?
+      <p>You're about to log back into the <b>Rebble Developer Forum</b> as
+      <tt>{{ user.username }}</tt> (since that's the username associated with your
+      Rebble account, {{ user.email }}).  Sound right?</p>
       
       {% endif %}
 
