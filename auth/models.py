@@ -8,7 +8,8 @@ from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 SUBSCRIBER_ROLLOUT_START = datetime.datetime(2019, 7, 21, 7, 0, 0, 0)
 NONSUBSCRIBER_ROLLOUT_START = datetime.datetime(2019, 7, 28, 7, 0, 0, 0)
 
-USERNAME_SET = frozenset(string.ascii_lowercase + string.digits + '-._')
+USERNAME_SET = frozenset(string.ascii_letters + string.digits + '-._')
+BAD_USERNAMES = frozenset({"anne_droid", "annedroid", "admin", "system", "administrator", "moderator", "rebble"})
 
 db = SQLAlchemy()
 migrate = Migrate()
@@ -51,7 +52,7 @@ class User(UserMixin, db.Model):
 
     @classmethod
     def is_valid_username(cls, username):
-        return set(username) <= USERNAME_SET and 4 <= len(username) <= 24
+        return set(username) <= USERNAME_SET and 4 <= len(username) <= 24 and username.lower() not in BAD_USERNAMES
 
 
 class UserIdentity(db.Model):

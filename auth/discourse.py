@@ -27,13 +27,16 @@ def discourse_sso_view():
 
         username = request.form.get('username')
         if username and username != '':
-            if User.is_valid_username(username):
-                User.query.filter_by(id=current_user.id).update({'username': username})
-                db.session.commit()
-            else:
-                abort(400, 'Username must only contain letters, numbers, dashes, dots and underscores.')
+            if current_user.username:
+                abort(400, 'You already have a username set on the Rebble Developer Forum.')
+            if not User.is_valid_username(username):
+                abort(400, 'Username must only contain letters, numbers, dashes, dots and underscores, and must not be a system username.')
+            if User.query.filter_by(username=username).count() != 0:
+                abort(400, 'Username is already taken.')
+            User.query.filter_by(id=current_user.id).update({'username': username})
+            db.session.commit()
         elif not current_user.username:
-            abort(400, 'Username missing.')
+            abort(400, 'You need to choose a username.')
 
     url = sso_redirect_url(nonce, current_user)
     return redirect(config['DISCOURSE_URL'] + url)
