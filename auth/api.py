@@ -65,15 +65,17 @@ def pebble_dev_portal_me():
 @oauth.require_oauth('pebble')
 def get_dictation_token():
     user = request.oauth.user
-    asr_token = IssuedToken.query.filter_by(user_id=user.id, scopes='{asr}').first()
-    if not asr_token:
-        asr_token = IssuedToken(user_id=user.id, client_id='asr', scopes=['asr'],
-                                expires=datetime.datetime.utcnow() + datetime.timedelta(days=3650),
-                                access_token=generate_token(15, 'abcdefghijklmnopqrsstuvwxyz0123456789'), refresh_token=generate_token())
-        db.session.add(asr_token)
-        db.session.commit()
-    return jsonify(token=asr_token.access_token)
-
+    if (user.is_subscribed):
+        asr_token = IssuedToken.query.filter_by(user_id=user.id, scopes='{asr}').first()
+        if not asr_token:
+            asr_token = IssuedToken(user_id=user.id, client_id='asr', scopes=['asr'],
+                                    expires=datetime.datetime.utcnow() + datetime.timedelta(days=3650),
+                                    access_token=generate_token(15, 'abcdefghijklmnopqrsstuvwxyz0123456789'), refresh_token=generate_token())
+            db.session.add(asr_token)
+            db.session.commit()
+        return jsonify(token=asr_token.access_token)
+    else:
+        abort(401)
 
 def init_app(app, url_prefix='/api/v1'):
     app.register_blueprint(api, url_prefix=url_prefix)
