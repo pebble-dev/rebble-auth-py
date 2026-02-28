@@ -81,8 +81,13 @@ def get_dictation_token():
 def wizard_get_user_by_identity(id):
     ensure_wizard()
 
-    idp, idp_user_id = id.split(':', 1)
-    identity = UserIdentity.query.filter_by(idp = idp, idp_user_id = idp_user_id).one()
+    try:
+        idp, idp_user_id = id.split(':', 1)
+        identity = UserIdentity.query.filter_by(idp = idp, idp_user_id = idp_user_id).one()
+    except NoResultFound:
+        return jsonify(error="Unknown user identity", e="identity.notfound"), 404
+    except Exception:
+        return jsonify(error="An unknown error occured", e="error.general", message="An error ocurred retrieving the user. Is the identity string valid?"), 500
 
     audit(f"Viewed useridentity {id}", request.oauth.user)
 
