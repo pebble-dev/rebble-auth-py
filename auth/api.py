@@ -1,6 +1,6 @@
 import datetime
 from flask import Blueprint, request, jsonify, abort
-from authlib.common.security import generate_token
+from oauthlib.common import generate_token
 from werkzeug.exceptions import BadRequest
 from sqlalchemy.orm.exc import NoResultFound
 
