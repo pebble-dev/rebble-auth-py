@@ -23,7 +23,8 @@ def me():
         name=request.oauth.user.name,
         is_subscribed=request.oauth.user.has_active_sub,
         scopes=request.oauth.scopes,
-        is_wizard=request.oauth.user.is_wizard,
+        is_wizard='wizard' in request.oauth.user.groups,
+        groups=request.oauth.user.groups,
         has_timeline=request.oauth.user.has_timeline,
         timeline_ttl=request.oauth.user.timeline_ttl,
         boot_overrides=request.oauth.user.boot_overrides
