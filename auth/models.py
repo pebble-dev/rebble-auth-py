@@ -113,6 +113,37 @@ class WizardAuditLog(db.Model):
     what = db.Column(db.String)
 
 
+class Election(db.Model):
+    __tablename__ = "elections"
+    id = db.Column(db.Integer, primary_key=True)
+    slug = db.Column(db.String, nullable=False)
+    name = db.Column(db.String, nullable=False)
+    created_at = db.Column(db.DateTime, nullable=False)
+    ends_at = db.Column(db.DateTime, nullable=False)
+    public = db.Column(db.Boolean, server_default='false', nullable=False)
+
+
+class Candidate(db.Model):
+    __tablename__ = "candidates"
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String, nullable=False)
+    description = db.Column(db.Text, nullable=False)
+    election_id = db.Column(db.Integer, db.ForeignKey('elections.id'), nullable=False)
+    election = db.relationship('Election')
+
+
+class Vote(db.Model):
+    __tablename__ = "votes"
+    id = db.Column(db.Integer, primary_key=True)
+    candidate_id = db.Column(db.Integer, db.ForeignKey('candidates.id'), nullable=False)
+    candidate = db.relationship('Candidate')
+    rank = db.Column(db.Integer, nullable=False)
+    user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
+    user = db.relationship('User')
+
+db.Index('votes_user_id_candidate_id_index', Vote.user_id, Vote.candidate_id, unique=True)
+
+
 def init_app(app):
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     db.init_app(app)

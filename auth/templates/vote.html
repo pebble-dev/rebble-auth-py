@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block body %}
+    <h2>{{ election.name }}</h2>
+    <p>Rank the candidates you would like to see elected. You should only rank one person with the same rank number. The highest priority rank is "1", while the lowest possible is "{{ candidates | length }}". Rank starting from "1" in increments of 1. Rank at least 3 candidates.</p>
+
+    <form method="POST">
+      <ul>
+      {% for candidate in candidates %}
+        <li>
+          <input type="number" id="candidate-{{ candidate.id }}" name="candidate_{{ candidate.id }}" min="0" max="{{ candidates | length }}"/>
+          <label for="candidate-{{ candidate.id }}">{{ candidate.name }}</label>
+          <details>
+            <summary>Details</summary>
+            {{ candidate.description | safe }}
+          </details>
+        </li>
+      {% endfor %}
+      </ul>
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      <input type="submit" value="Vote!" />
+    </form>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul class=flashes style="color:red;">
+        {% for message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+{% endblock %}

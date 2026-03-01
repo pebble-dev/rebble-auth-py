@@ -15,6 +15,7 @@ from .redis import init_app as init_redis
 from .billing import init_app as init_billing
 from .wizard import init_app as init_wizard
 from .discourse import init_app as init_discourse
+from .voting import init_app as init_voting
 
 from .settings import config
 
@@ -71,6 +72,7 @@ init_billing(app)
 init_api(app)
 init_wizard(app)
 init_discourse(app)
+init_voting(app)
 
 
 # XXX: upstream this
