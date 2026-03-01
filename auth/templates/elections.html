@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block body %}
+    <h2>Elections</h2>
+    <ul>
+      {% for election in elections %}
+      <li><a href="{{ url_for('voting.election', slug=election.slug) }}">{{ election.name }} (ends {{election.ends_at}})</a></li>
+      {% endfor %}
+    </ul>
+    {% with messages = get_flashed_messages() %}
+      {% if messages %}
+        <ul class=flashes style="color:red;">
+        {% for message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+{% endblock %}
