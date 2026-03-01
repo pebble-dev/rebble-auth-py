@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block body %}
+    <h2>Elections</h2>
+    <ul>
+      {% for election in elections %}
+      {% if not (current_user.is_wizard or election.public) %}
+      {% elif election.ends_at < now %}
+      <li><a href="{{ url_for('voting.election', slug=election.slug) }}"><s>{{ election.name }}</s></a> (<i>Election ended {{election.ends_at}}.</i>)</li>
+      {% elif current_user.id < election.minimum_user_id %}
+      <li><a href="{{ url_for('voting.election', slug=election.slug) }}"><s>{{ election.name }}</s></a> (<i>Your account is too new to vote in this election.</i>)</li>
+      {% else %}
+      <li><a href="{{ url_for('voting.election', slug=election.slug) }}">{{ election.name }}</a> (ends {{election.ends_at}})</li>
+      {% endif %}
+      {% endfor %}
+    </ul>
+    {% with messages = get_flashed_messages(category_filter=["voting"]) %}
+      {% if messages %}
+        <ul class=flashes style="color:red;">
+        {% for message in messages %}
+          <li>{{ message }}</li>
+        {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+{% endblock %}
