@@ -37,7 +37,7 @@ def election(slug):
         no_vote = "You already voted in this election! Thank you!"
     if election.ends_at < datetime.now():
         no_vote = "This election has already ended."
-    if current_user.id < election.minimum_user_id:
+    if current_user.id > election.minimum_user_id:
         no_vote = "Your account is too new to vote in this election."
 
     if request.method == 'GET':

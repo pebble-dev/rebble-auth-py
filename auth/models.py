@@ -121,7 +121,7 @@ class Election(db.Model):
     name = db.Column(db.String, nullable=False)
     created_at = db.Column(db.DateTime, nullable=False)
     ends_at = db.Column(db.DateTime, nullable=False)
-    minimum_user_id = db.Column(db.Integer)
+    minimum_user_id = db.Column(db.Integer) # this actually is maximum, but the name is already in the database, so it is what it is.  maybe 'minimum_user_id' that is not eligible to vote!
     public = db.Column(db.Boolean, server_default='false', nullable=False)
 
 

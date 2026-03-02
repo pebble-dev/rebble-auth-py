@@ -6,7 +6,7 @@
       {% if not (current_user.is_wizard or election.public) %}
       {% elif election.ends_at < now %}
       <li><a href="{{ url_for('voting.election', slug=election.slug) }}"><s>{{ election.name }}</s></a> (<i>Election ended {{election.ends_at}}.</i>)</li>
-      {% elif current_user.id < election.minimum_user_id %}
+      {% elif current_user.id > election.minimum_user_id %}
       <li><a href="{{ url_for('voting.election', slug=election.slug) }}"><s>{{ election.name }}</s></a> (<i>Your account is too new to vote in this election.</i>)</li>
       {% else %}
       <li><a href="{{ url_for('voting.election', slug=election.slug) }}">{{ election.name }}</a> (ends {{election.ends_at}})</li>
