@@ -3,7 +3,8 @@ import string
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_login import UserMixin
-from sqlalchemy.dialects.postgresql import ARRAY, JSONB
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB, UUID
+from uuid import uuid4
 
 SUBSCRIBER_ROLLOUT_START = datetime.datetime(2019, 7, 21, 7, 0, 0, 0)
 NONSUBSCRIBER_ROLLOUT_START = datetime.datetime(2019, 7, 28, 7, 0, 0, 0)
@@ -120,6 +121,7 @@ class Election(db.Model):
     name = db.Column(db.String, nullable=False)
     created_at = db.Column(db.DateTime, nullable=False)
     ends_at = db.Column(db.DateTime, nullable=False)
+    minimum_user_id = db.Column(db.Integer)
     public = db.Column(db.Boolean, server_default='false', nullable=False)
 
 
@@ -132,16 +134,26 @@ class Candidate(db.Model):
     election = db.relationship('Election')
 
 
-class Vote(db.Model):
-    __tablename__ = "votes"
+class VoteReceipt(db.Model):
+    """
+    Receipt that any given user has voted in any given election.
+    """
+    __tablename__ = "votereceipts"
     id = db.Column(db.Integer, primary_key=True)
-    candidate_id = db.Column(db.Integer, db.ForeignKey('candidates.id'), nullable=False)
-    candidate = db.relationship('Candidate')
-    rank = db.Column(db.Integer, nullable=False)
+    election_id = db.Column(db.Integer, db.ForeignKey('elections.id'), nullable=False)
+    election = db.relationship('Election')
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     user = db.relationship('User')
+    voted_at = db.Column(db.DateTime)
+db.Index('votereceipts_user_id_election_id_index', VoteReceipt.user_id, VoteReceipt.election_id, unique=True)
 
-db.Index('votes_user_id_candidate_id_index', Vote.user_id, Vote.candidate_id, unique=True)
+
+class Vote(db.Model):
+    __tablename__ = "votes"
+    uuid = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid4) # decouple this from votereceipt!
+    election_id = db.Column(db.Integer, db.ForeignKey('elections.id'), nullable=False)
+    election = db.relationship('Election')
+    vote = db.Column(ARRAY(db.Integer))
 
 
 def init_app(app):

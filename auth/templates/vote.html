@@ -1,25 +1,72 @@
 {% extends "base.html" %}
 {% block body %}
+    <style>
+      #ranked .unrankonly { display: none; }
+      #unranked .rankonly { display: none; }
+      #tchoice + li .rankup { display: none; }
+      li:has(+ #bchoice) .rankdown { display: none; }
+    </style>
+    <script>
+      function c_elem(id) {
+        return document.querySelector("#candidate-"+id);
+      }
+      function addrank(id) {
+        document.querySelector("#bchoice").before(c_elem(id));
+        recompute_ranks();
+      }
+      function unrank(id) {
+        document.querySelector("#unranked").append(c_elem(id));
+        recompute_ranks();
+      }
+      function rankup(id) {
+        const el = c_elem(id);
+        if (!el.previousElementSibling || el.previousElementSibling.className != "candidate")
+          return;
+        el.previousElementSibling.before(el);
+        recompute_ranks();
+      }
+      function rankdown(id) {
+        const el = c_elem(id);
+        if (!el.nextElementSibling || el.nextElementSibling.className != "candidate")
+          return;
+        el.nextElementSibling.after(el);
+        recompute_ranks();
+      }
+      function recompute_ranks() {
+        var ids = [];
+        var names = []
+        
+        for (const el of document.querySelector("#ranked").childNodes) {
+          if (!el.dataset || !el.dataset.candidateId)
+            continue;
+          ids.push(parseInt(el.dataset.candidateId));
+          names.push(el.querySelector("#cname").innerHTML);
+        }
+        console.log(ids);
+        console.log(names);
+        document.querySelector("#votes").value = ids.join();
+        if (names.length == 0) {
+          document.querySelector("#votenames").innerHTML = "nobody!";
+        } else {
+          document.querySelector("#votenames").innerHTML = names.join(", ");
+        }
+      }
+    </script>
     <h2>{{ election.name }}</h2>
-    <p>Rank the candidates you would like to see elected. You should only rank one person with the same rank number. The highest priority rank is "1", while the lowest possible is "{{ candidates | length }}". Rank starting from "1" in increments of 1. Rank at least 3 candidates.</p>
+    <p>
 
-    <form method="POST">
-      <ul>
-      {% for candidate in candidates %}
-        <li>
-          <input type="number" id="candidate-{{ candidate.id }}" name="candidate_{{ candidate.id }}" min="0" max="{{ candidates | length }}"/>
-          <label for="candidate-{{ candidate.id }}">{{ candidate.name }}</label>
-          <details>
-            <summary>Details</summary>
-            {{ candidate.description | safe }}
-          </details>
-        </li>
-      {% endfor %}
-      </ul>
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
-      <input type="submit" value="Vote!" />
-    </form>
-    {% with messages = get_flashed_messages() %}
+    {% if no_vote %}
+    You cannot vote in this election, but feel free to have a look at the
+    candidates.
+    {% else %}    
+    Rank the candidates you would like to see elected, in order of your
+    preference!  (The candidates are presented to you in random order.) You
+    need to rank at least 3 candidates for your vote to count.
+    {% endif %}
+    
+    </p>
+
+    {% with messages = get_flashed_messages(category_filter=["voting"]) %}
       {% if messages %}
         <ul class=flashes style="color:red;">
         {% for message in messages %}
@@ -28,5 +75,38 @@
         </ul>
       {% endif %}
     {% endwith %}
+
+    <form method="POST">
+      <h2>Candidates you're voting for!</h2>
+      <ul id="ranked">
+        <li id="tchoice"><i>Your top (i.e., most preferred) choice</i></li>
+        <li id="bchoice"><i>Your bottom (i.e., least preferred) choice</i></li>
+      </ul>
+      <h2>Candidates you haven't ranked yet</h2>
+      <ul id="unranked">
+      {% for candidate in candidates %}
+        <li id="candidate-{{ candidate.id }}" class="candidate" data-candidate-id="{{ candidate.id }}">
+          <b id="cname">{{ candidate.name | safe }}</b>:
+          <button class="unrankonly" type="button" onclick="addrank({{candidate.id}})">Add to ranking</button>
+          <button class="rankonly rankup" type="button" onclick="rankup({{candidate.id}})">Rank higher</button>
+          <button class="rankonly rankdown" type="button" onclick="rankdown({{candidate.id}})">Rank lower</button>
+          <button class="rankonly" type="button" onclick="unrank({{candidate.id}})">Remove from ranking</button>
+          <details>
+            <summary>Read more about this candidate!</summary>
+            {{ candidate.description | safe }}
+          </details>
+        </li>
+      {% endfor %}
+      </ul>
+      <hr>
+      {% if no_vote %}
+      <p>{{ no_vote }}</p>
+      {% else %}
+      <p>If you click the button below, you will vote for, in order from highest to lowest: <i><span id="votenames">nobody!</span></i><p>
+      <input type="hidden" name="vote" id="votes" value="" />
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      <input type="submit" value="Vote!" />
+      {% endif %}
+    </form>
 
 {% endblock %}
