@@ -38,7 +38,7 @@ def election(slug):
     if election.ends_at < datetime.now():
         no_vote = "This election has already ended."
     if current_user.id > election.minimum_user_id:
-        no_vote = "Your account is too new to vote in this election."
+        no_vote = "Your account is too new to vote in this election.  (Maybe you are not logged in with the same account that you normally use?  You can <a href=\"https://auth.rebble.io/account/\">log out and try again</a>, if so.)"
 
     if request.method == 'GET':
         return render_template('vote.html', election=election, candidates=random.sample(candidates, k=len(candidates)), no_vote=no_vote)

@@ -7,7 +7,7 @@
       {% elif election.ends_at < now %}
       <li><a href="{{ url_for('voting.election', slug=election.slug) }}"><s>{{ election.name }}</s></a> (<i>Election ended {{election.ends_at}}.</i>)</li>
       {% elif current_user.id > election.minimum_user_id %}
-      <li><a href="{{ url_for('voting.election', slug=election.slug) }}"><s>{{ election.name }}</s></a> (<i>Your account is too new to vote in this election.</i>)</li>
+      <li><a href="{{ url_for('voting.election', slug=election.slug) }}"><s>{{ election.name }}</s></a> (<i>Your account is too new to vote in this election. Maybe you are not logged in with the same account that you normally use?  You can <a href=\"https://auth.rebble.io/account/\">log out and try again</a>, if so.</i>)</li>
       {% else %}
       <li><a href="{{ url_for('voting.election', slug=election.slug) }}">{{ election.name }}</a> (ends {{election.ends_at}})</li>
       {% endif %}
