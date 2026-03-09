@@ -30,6 +30,7 @@ class User(UserMixin, db.Model):
     stripe_subscription_id = db.Column(db.String, nullable=True, index=True)
     subscription_expiry = db.Column(db.DateTime, nullable=True)
     is_wizard = db.Column(db.Boolean, server_default='false')
+    groups = db.Column(ARRAY(db.String), nullable=False, server_default='{}')
     boot_overrides = db.Column(JSONB)
     audio_debug_mode = db.Column(db.DateTime, nullable=True)
     username = db.Column(db.String(24), unique=True, index=True)
@@ -40,7 +41,7 @@ class User(UserMixin, db.Model):
     
     @property
     def has_timeline(self):
-        return self.is_wizard or self.has_active_sub or \
+        return 'wizard' in self.groups or self.has_active_sub or \
                (datetime.datetime.utcnow() > (NONSUBSCRIBER_ROLLOUT_START + datetime.timedelta(seconds = self.id * 2)))
     
     @property
