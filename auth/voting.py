@@ -92,12 +92,12 @@ def elect(election):
     print("")
     
     def run_rc(elim_set):
-        cset = {}
+        cset = {c: 0 for c in candidates if c not in elim_set}
         for vote in votes:
             for c in vote:
                 if c in elim_set:
                     continue
-                cset[c] = cset.get(c, 0) + 1
+                cset[c] = cset[c] + 1
                 break
         cvote = [(n,c) for c,n in cset.items()]
         cvote.sort()
