@@ -6,6 +6,9 @@ from datetime import datetime
 
 from auth.models import db, Election, Candidate, Vote, VoteReceipt
 
+from flask.cli import with_appcontext
+import click
+
 voting_blueprint = Blueprint("voting", __name__)
 
 @voting_blueprint.route("/", methods=['GET'])
@@ -73,6 +76,52 @@ def election(slug):
     flash(f"Your vote (ID #{vote.uuid}) has been recorded. Thank you!", "voting")
     return redirect(url_for('voting.elections'))
 
+@click.command("elect")
+@with_appcontext
+@click.argument("election")
+def elect(election):
+    election = Election.query.filter_by(slug = election).one()
+    
+    print(f"Running election for election id {election.id} ({election.name})")
+    candidates = {}
+    for c in Candidate.query.filter_by(election_id = election.id).all():
+        print(f"  Candidate {c.id}: {c.name}")
+        candidates[c.id] = c.name
+    votes = [v.vote for v in Vote.query.filter_by(election_id = election.id).all()]
+    print(f"Loaded {len(votes)} votes")
+    print("")
+    
+    def run_rc(elim_set):
+        cset = {}
+        for vote in votes:
+            for c in vote:
+                if c in elim_set:
+                    continue
+                cset[c] = cset.get(c, 0) + 1
+                break
+        cvote = [(n,c) for c,n in cset.items()]
+        cvote.sort()
+        
+        wvotes,winner = cvote[-1]
+        lvotes,loser = cvote[0]
+        
+        return (winner,wvotes),(loser,lvotes)
+    
+    electedset = set()
+    for n in range(10):
+        w = 0
+        l = 1
+        round = 1
+        elimset = set() | electedset
+        while w != l:
+            (w,wv),(l,lv) = run_rc(elimset)
+            if w != l:
+                print(f"    round {round}: candidate {w} had {wv} votes, eliminated candidate {l} with {lv} votes")
+            elimset.add(l)
+            round += 1
+        print(f"  #{n+1}: Candidate #{w} ({candidates[w]})")
+        electedset.add(w)
 
 def init_app(app):
     app.register_blueprint(voting_blueprint, url_prefix='/vote')
+    app.cli.add_command(elect)
