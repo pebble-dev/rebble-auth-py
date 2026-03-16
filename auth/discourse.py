@@ -50,7 +50,7 @@ def sso_redirect_url(nonce, user):
         'username': user.username
     }
 
-    if user.is_wizard:
+    if 'wizard' in user.groups:
         attributes['admin'] = 'true'
 
     add_groups = []

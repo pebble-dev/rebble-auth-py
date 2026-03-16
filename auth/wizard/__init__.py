@@ -18,7 +18,7 @@ def format_datetime(value, format='%B %-d %Y, %H:%M:%S'):
     return value.strftime(format)
 
 def ensure_wizard():
-    if not current_user.is_wizard:
+    if not 'wizard' in current_user.groups:
         abort(401, 'Hmm... how did you get here?')
 
 def audit(str):
@@ -181,7 +181,8 @@ def make_wizard(idp_name, idp_user_id):
     identity = UserIdentity.query.filter_by(idp=idp_name, idp_user_id=idp_user_id).one()
     user = identity.user
 
-    user.is_wizard = True    
+    if not 'wizard' in user.group:
+        user.groups = user.groups.append('wizard')
     db.session.commit()
     
     print(f"Ok, made {user.name} <{user.email}> a wizard.")
