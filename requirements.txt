@@ -33,6 +33,6 @@ stripe==1.82.2
 urllib3==1.24.2
 Werkzeug==0.15.3
 WTForms==2.2.1
-honeycomb-beeline==2.11.4
+honeycomb-beeline==2.18.0
 gunicorn
 Flask-Cors==3.0.6

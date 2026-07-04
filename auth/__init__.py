@@ -3,8 +3,11 @@ from flask_login import login_required, current_user
 from flask_sslify import SSLify
 from flask_wtf import CSRFProtect
 
+import os
+
 import beeline
 from beeline.middleware.flask import HoneyMiddleware
+import beeline.propagation.w3c as w3c
 
 from .models import init_app as init_db, db
 from .login import init_app as init_login
@@ -59,7 +62,12 @@ def sampler(fields):
 app = Flask(__name__)
 CSRFProtect(app)
 app.config.update(**config)
-beeline.init(writekey=config['HONEYCOMB_KEY'], dataset='rws', service_name='auth', sampler_hook=sampler)
+if os.environ.get('O11Y_SHOULD_USE_W3C_TRACE_HEADERS', False):
+    # Only turn this on once EVERYTHING has migrated to the new
+    # rws_common version that supports W3C trace headers.
+    beeline.init(writekey=config['HONEYCOMB_KEY'], dataset='rws', service_name='auth', sampler_hook=sampler, http_trace_propagation_hook=w3c.http_trace_propagation_hook)
+else:
+    beeline.init(writekey=config['HONEYCOMB_KEY'], dataset='rws', service_name='auth', sampler_hook=sampler)
 HoneyMiddleware(app, db_events = True)
 sslify = SSLify(app, skips=['heartbeat'])
 if not app.debug:
