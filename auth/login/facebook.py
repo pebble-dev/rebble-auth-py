@@ -1,4 +1,4 @@
-from flask import g
+from flask import render_template
 
 from ..models import db
 from .base import auth, login_blueprint, complete_auth_flow, secure_url_for, prepare_state, validate_state, get_state
@@ -17,23 +17,25 @@ facebook = auth.remote_app(
 
 @login_blueprint.route("/facebook")
 def facebook_auth_start():
-    prepare_state()
-    return facebook.authorize(secure_url_for('.facebook_auth_complete'))
+    # See #32 - Facebook auth disabled due to some weird Facebook issues.
+    # prepare_state()
+    # return facebook.authorize(secure_url_for('.facebook_auth_complete'))
+    return render_template('facebook-not-available.html')
 
 
-@login_blueprint.route("/facebook/complete")
-def facebook_auth_complete():
-    validate_state()
-    resp = facebook.authorized_response()
-    if resp is None or resp.get('access_token') is None:
-        return 'Failed.'
-    g.facebook_token = (resp['access_token'], '')
-    me = facebook.get('me?fields=id,name,email').data
-    response = complete_auth_flow(facebook.name, me["id"], me["name"], me.get('email',  None))
-    db.session.commit()
-    return response
+# @login_blueprint.route("/facebook/complete")
+# def facebook_auth_complete():
+#     validate_state()
+#     resp = facebook.authorized_response()
+#     if resp is None or resp.get('access_token') is None:
+#         return 'Failed.'
+#     g.facebook_token = (resp['access_token'], '')
+#     me = facebook.get('me?fields=id,name,email').data
+#     response = complete_auth_flow(facebook.name, me["id"], me["name"], me.get('email',  None))
+#     db.session.commit()
+#     return response
 
 
-@facebook.tokengetter
-def get_token():
-    return g.facebook_token
+# @facebook.tokengetter
+# def get_token():
+#     return g.facebook_token
