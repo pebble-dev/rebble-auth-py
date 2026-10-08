@@ -5,7 +5,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, abort
 from flask_login import login_required, current_user
 
 from auth import db
-from auth.models import User, UserIdentity, WizardAuditLog
+from auth.models import User, UserIdentity, WizardAuditLog, Group
 from auth.settings import config
 
 from flask.cli import with_appcontext
@@ -18,7 +18,7 @@ def format_datetime(value, format='%B %-d %Y, %H:%M:%S'):
     return value.strftime(format)
 
 def ensure_wizard():
-    if not current_user.is_wizard:
+    if not current_user.groups.filter_by(id='wizard').first():
         abort(401, 'Hmm... how did you get here?')
 
 def audit(str):
@@ -181,7 +181,8 @@ def make_wizard(idp_name, idp_user_id):
     identity = UserIdentity.query.filter_by(idp=idp_name, idp_user_id=idp_user_id).one()
     user = identity.user
 
-    user.is_wizard = True    
+    if not user.groups.filter_by(id='wizard').first():
+        user.groups.append(Group.query.filter_by(id='wizard').first())
     db.session.commit()
     
     print(f"Ok, made {user.name} <{user.email}> a wizard.")

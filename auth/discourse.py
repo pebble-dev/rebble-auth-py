@@ -4,7 +4,7 @@ from pydiscourse.sso import sso_validate, sso_payload
 from flask import Blueprint, request, abort, redirect, render_template
 from flask_login import login_required, current_user
 
-from auth.models import db, User
+from auth.models import db, User, Group
 from auth.settings import config
 
 discourse_blueprint = Blueprint("discourse", __name__)
@@ -50,7 +50,7 @@ def sso_redirect_url(nonce, user):
         'username': user.username
     }
 
-    if user.is_wizard:
+    if user.groups.filter_by(id='wizard').first():
         attributes['admin'] = 'true'
 
     add_groups = []

@@ -16,6 +16,11 @@ db = SQLAlchemy()
 migrate = Migrate()
 
 
+group_users = db.Table('group_users', db.Model.metadata,
+                   db.Column('user_id', db.Integer, db.ForeignKey('users.id', ondelete='cascade')),
+                   db.Column('group_id', db.String, db.ForeignKey('groups.id', ondelete='cascade')))
+
+
 class User(UserMixin, db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
@@ -29,7 +34,11 @@ class User(UserMixin, db.Model):
     stripe_customer_id = db.Column(db.String, nullable=True, index=True)
     stripe_subscription_id = db.Column(db.String, nullable=True, index=True)
     subscription_expiry = db.Column(db.DateTime, nullable=True)
-    is_wizard = db.Column(db.Boolean, server_default='false')
+    groups = db.relationship('Group',
+                             back_populates='users',
+                             secondary=group_users,
+                             passive_deletes=True,
+                             lazy='dynamic')
     boot_overrides = db.Column(JSONB)
     audio_debug_mode = db.Column(db.DateTime, nullable=True)
     username = db.Column(db.String(24), unique=True, index=True)
@@ -40,7 +49,7 @@ class User(UserMixin, db.Model):
     
     @property
     def has_timeline(self):
-        return self.is_wizard or self.has_active_sub or \
+        return self.groups.filter_by(id='wizard').first() is not None or self.has_active_sub or \
                (datetime.datetime.utcnow() > (NONSUBSCRIBER_ROLLOUT_START + datetime.timedelta(seconds = self.id * 2)))
     
     @property
@@ -54,6 +63,16 @@ class User(UserMixin, db.Model):
     @classmethod
     def is_valid_username(cls, username):
         return set(username) <= USERNAME_SET and 4 <= len(username) <= 24 and username.lower() not in BAD_USERNAMES
+
+
+class Group(db.Model):
+    __tablename__ = "groups"
+    id = db.Column(db.String, primary_key=True)
+    users = db.relationship('User',
+                            back_populates='groups',
+                            secondary=group_users,
+                            passive_deletes=True,
+                            lazy='dynamic')
 
 
 class UserIdentity(db.Model):
