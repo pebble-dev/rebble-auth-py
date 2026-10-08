@@ -43,8 +43,14 @@
             </td>
         </tr>
         <tr>
-            <td>Developer ID</td>
-            <td>{{ user.pebble_dev_portal_uid }}</td>
+            <td>Developer IDs</td>
+            <td>
+                <ul>
+                {% for developer in user.developers %}
+                    <li><a href="https://apps.rebble.io/developer/{{ developer.id }}" target="_blank">{{ developer.id }}</a></li>
+                {% endfor %}
+                </ul>
+            </td>
             <td>
                 <form action="{{ url_for("wizard.user_modify", id=user.id) }}" method="POST" style="display: inline;">
                     <input type="text" name="pebble_dev_portal_uid" />

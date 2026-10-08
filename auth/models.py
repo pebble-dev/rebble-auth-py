@@ -16,13 +16,17 @@ db = SQLAlchemy()
 migrate = Migrate()
 
 
+user_developer = db.Table('user_developer', db.Model.metadata,
+                         db.Column('user_id', db.Integer, db.ForeignKey('users.id', ondelete='cascade')),
+                         db.Column('developer_id', db.String(24), db.ForeignKey('developers.id', ondelete='cascade')))
+
+
 class User(UserMixin, db.Model):
     __tablename__ = "users"
     id = db.Column(db.Integer, primary_key=True)
     email = db.Column(db.String, nullable=False)
     name = db.Column(db.String)
     pebble_auth_uid = db.Column(db.String(24), nullable=True)
-    pebble_dev_portal_uid = db.Column(db.String(24), nullable=True)
     pebble_token = db.Column(db.String, nullable=True, index=True)
     has_logged_in = db.Column(db.Boolean, nullable=False, server_default='false')
     account_type = db.Column(db.Integer, nullable=False, server_default='0')
@@ -33,6 +37,12 @@ class User(UserMixin, db.Model):
     boot_overrides = db.Column(JSONB)
     audio_debug_mode = db.Column(db.DateTime, nullable=True)
     username = db.Column(db.String(24), unique=True, index=True)
+
+    developers = db.relationship('Developer',
+                                 back_populates='users',
+                                 secondary=user_developer,
+                                 passive_deletes=True,
+                                 lazy='dynamic')
 
     @property
     def has_active_sub(self):
@@ -55,6 +65,16 @@ class User(UserMixin, db.Model):
     def is_valid_username(cls, username):
         return set(username) <= USERNAME_SET and 4 <= len(username) <= 24 and username.lower() not in BAD_USERNAMES
 
+
+class Developer(db.Model):
+    __tablename__ = "developers"
+    id = db.Column(db.String(24), primary_key=True)
+
+    users = db.relationship('User',
+                            back_populates='developers',
+                            secondary=user_developer,
+                            passive_deletes=True,
+                            lazy='dynamic')
 
 class UserIdentity(db.Model):
     __tablename__ = "user_identities"

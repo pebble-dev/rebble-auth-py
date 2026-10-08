@@ -5,7 +5,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, abort
 from flask_login import login_required, current_user
 
 from auth import db
-from auth.models import User, UserIdentity, WizardAuditLog
+from auth.models import User, UserIdentity, WizardAuditLog, Developer
 from auth.settings import config
 
 from flask.cli import with_appcontext
@@ -100,9 +100,12 @@ def user_modify(id):
         user.email = new
     elif 'pebble_dev_portal_uid' in request.form:
         what = 'developer ID'
-        old = user.pebble_dev_portal_uid
+        old = user.developers[0].id
         new = request.form['pebble_dev_portal_uid']
-        user.pebble_dev_portal_uid = new
+        developer = Developer.query.filter_by(id=new).one_or_none()
+        if developer is None:
+            developer = Developer(id=new)
+        user.developers.append(developer)
     
     audit(f"MODIFICATION: Changed user {user.id} {what} from '{old}' to '{new}'")
     db.session.commit()

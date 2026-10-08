@@ -11,7 +11,7 @@ from flask import g
 
 from flask import current_app
 
-from ..models import db
+from ..models import db, Developer
 from .base import auth, login_blueprint, secure_url_for, redirect_next, get_state, prepare_state, validate_state
 
 pebble = auth.remote_app(
@@ -52,7 +52,10 @@ def pebble_auth_complete():
     user_info = pebble.request('me.json').data
     current_user.pebble_auth_uid = user_info['id']
     store_info = pebble.request('https://dev-portal.getpebble.com/api/users/me').data
-    current_user.pebble_dev_portal_uid = store_info['users'][0]['id']
+    developer = Developer.query.filter_by(id=store_info['users'][0]['id']).one_or_none()
+    if developer is None:
+        developer = Developer(id=store_info['users'][0]['id'])
+    current_user.developers.append(developer)
     db.session.commit()
     return redirect_next()
 
@@ -74,8 +77,8 @@ id_generator = ObjectIdGenerator()
 
 def generate_pebble_ids(user):
     must_commit = False
-    if user.pebble_dev_portal_uid is None:
-        user.pebble_dev_portal_uid = id_generator.generate()
+    if len(user.developers) == 0:
+        user.developers = [Developer(id=id_generator.generate())]
         must_commit = True
     if user.pebble_auth_uid is None:
         user.pebble_auth_uid = id_generator.generate()

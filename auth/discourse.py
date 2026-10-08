@@ -61,10 +61,10 @@ def sso_redirect_url(nonce, user):
     else:
         remove_groups.append('subscribers')
 
-    if user.pebble_dev_portal_uid:
+    if not len(user.developers) == 0:
         # TODO: Check if the user has any public apps
         add_groups.append('developers')
-        attributes['website'] = f"https://apps.rebble.io/developer/{user.pebble_dev_portal_uid}"
+        attributes['website'] = f"https://apps.rebble.io/developer/{user.developers[0].id}"
 
     if add_groups != []:
         attributes['add_groups'] = ','.join(add_groups)

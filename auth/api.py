@@ -4,7 +4,7 @@ from oauthlib.common import generate_token
 from werkzeug.exceptions import BadRequest
 from sqlalchemy.orm.exc import NoResultFound
 
-from auth.models import IssuedToken, db, User, UserIdentity, WizardAuditLog
+from auth.models import IssuedToken, db, User, UserIdentity, WizardAuditLog, Developer
 from .oauth import oauth
 from .login.pebble import api_ensure_pebble
 
@@ -55,7 +55,8 @@ def pebble_auth_me():
 def pebble_dev_portal_me():
     user = request.oauth.user
     return jsonify({
-        'id': user.pebble_dev_portal_uid,
+        'id': user.developers[0].id,
+        'ids': [developer.id for developer in user.developers],
         'uid': user.pebble_auth_uid,
         'rebble_id': user.id,
         'rebble_username': user.username,
@@ -95,7 +96,7 @@ def wizard_get_user_by_identity(id):
         'user_name': identity.user.name,
         'user_email': identity.user.email,
         'pebble_auth_uid': identity.user.pebble_auth_uid,
-        'pebble_dev_portal_uid': identity.user.pebble_dev_portal_uid,
+        'pebble_dev_portal_uid': identity.user.developers[0].id,
         'pebble_token': identity.user.pebble_token,
         'has_logged_in': identity.user.has_logged_in,
         'account_type': identity.user.account_type,
@@ -135,16 +136,19 @@ def wizard_update_user_developer_id():
     except Exception:
         return jsonify(error="An unknown error occured", e="error.general", message="An error ocurred retrieving the user. Is the ID valid?"), 500
 
-    old_developer_id = user.pebble_dev_portal_uid
-    user.pebble_dev_portal_uid = req["developer_id"]
+    old_developer_id = user.developers[0].id
+    developer = Developer.query.filter_by(id=req["developer_id"]).one_or_none()
+    if developer is None:
+        developer = Developer(id=req["developer_id"])
+    user.developers.append(developer)
     db.session.commit()
 
-    audit(f"API MODIFICATION: Changed user {user.id} developer ID from '{old_developer_id}' to '{user.pebble_dev_portal_uid}'", request.oauth.user)
+    audit(f"API MODIFICATION: Changed user {user.id} developer ID from '{old_developer_id}' to '{user.developers[0].id}'", request.oauth.user)
 
     return jsonify({
         'user_id': user.id,
         'user_name': user.name,
-        'developer_id': user.pebble_dev_portal_uid
+        'developer_id': user.developers[0].id
     })
 
 def ensure_wizard():
