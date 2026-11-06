@@ -1,9 +1,12 @@
 alembic==1.20.1
+authlib==1.9.1
 blinker==1.9.0
 cachelib==0.17.0
 certifi==2026.10.23
+cffi==2.1.1 ; platform_python_implementation != 'PyPy'
 charset-normalizer==3.5.2
 click==8.5.0
+cryptography==50.0.2
 flask==3.1.3
 flask-cors==6.0.5
 flask-login==0.6.3
@@ -16,11 +19,13 @@ gunicorn==26.2.0
 idna==3.20
 itsdangerous==2.2.0
 jinja2==3.1.6
+joserfc==1.7.7
 mako==1.4.3
 markupsafe==3.0.4
 oauthlib==2.1.0
 psycopg==3.3.6
 psycopg-binary==3.3.6 ; implementation_name != 'pypy'
+pycparser==3.12 ; implementation_name != 'PyPy' and platform_python_implementation != 'PyPy'
 pydiscourse==1.7.0
 pyjwt==2.15.1
 redis==8.1.0
