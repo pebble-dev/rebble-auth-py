@@ -1,8 +1,10 @@
 from flask import Flask, render_template, request, redirect
 from flask_login import login_required, current_user
 from flask_wtf import CSRFProtect
+from opentelemetry import trace
 from werkzeug.middleware.proxy_fix import ProxyFix
 
+from .tracing import init_app as init_tracing
 from .models import init_app as init_db, db
 from .login import init_app as init_login
 from .login.pebble import ensure_pebble
@@ -18,6 +20,7 @@ from .settings import config
 
 app = Flask(__name__)
 app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1)
+init_tracing(app)
 CSRFProtect(app)
 app.config.update(**config)
 # Before ProxyFix we never saw requests as HTTPS, so Flask-WTF's HTTPS-only
@@ -46,6 +49,14 @@ init_wizard(app)
 init_discourse(app)
 init_voting(app)
 
+
+@app.before_request
+def before_request():
+    span = trace.get_current_span()
+    if request.endpoint:
+        span.set_attribute("flask.endpoint", request.endpoint)
+    if current_user.is_authenticated:
+        span.set_attribute("user.id", current_user.id)
 
 @app.route("/")
 @login_required
