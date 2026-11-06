@@ -28,6 +28,18 @@ where they do not conflict.
 Setup
 -----
 
+### Installing
+
+Dependencies are managed with [uv](https://docs.astral.sh/uv/). To
+create a virtualenv with everything installed, run:
+
+```
+uv sync
+```
+
+Use `uv add` / `uv remove` to change dependencies; commit the updated
+`uv.lock` along with `pyproject.toml`.
+
 ### Configuration
 
 The server expects to find its configuration in a proliferation of
@@ -58,7 +70,7 @@ rebble-auth uses [alembic](https://bitbucket.org/zzzeek/alembic) via
 migrations. To create or update the database state, run this command:
 
 ```
-flask db upgrade
+uv run flask db upgrade
 ```
 
 ### Running the server
@@ -66,7 +78,7 @@ flask db upgrade
 You can run the server in debug mode:
 
 ```
-python serve_debug.py
+uv run python serve_debug.py
 ```
 
 This will bring up the server in single-threaded, synchronous mode
