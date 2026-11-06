@@ -1,8 +1,8 @@
 import datetime
 from flask import Blueprint, request, jsonify, abort
 from oauthlib.common import generate_token
-from werkzeug.exceptions import BadRequest
-from sqlalchemy.orm.exc import NoResultFound
+from werkzeug.exceptions import BadRequest, UnsupportedMediaType
+from sqlalchemy.exc import NoResultFound
 
 from auth.models import IssuedToken, db, User, UserIdentity, WizardAuditLog
 from .oauth import oauth
@@ -67,7 +67,7 @@ def pebble_dev_portal_me():
 @oauth.require_oauth('pebble')
 def get_dictation_token():
     user = request.oauth.user
-    asr_token = IssuedToken.query.filter_by(user_id=user.id, scopes='{asr}').first()
+    asr_token = IssuedToken.query.filter_by(user_id=user.id, scopes=['asr']).first()
     if not asr_token:
         asr_token = IssuedToken(user_id=user.id, client_id='asr', scopes=['asr'],
                                 expires=datetime.datetime.utcnow() + datetime.timedelta(days=3650),
@@ -115,7 +115,9 @@ def wizard_update_user_developer_id():
     ensure_wizard()
 
     try:
-        req = request.json
+        req = request.get_json()
+    except UnsupportedMediaType:
+        req = None
     except BadRequest:
         return jsonify(error="Invalid POST body. Expected JSON", e="body.invalid"), 400
 

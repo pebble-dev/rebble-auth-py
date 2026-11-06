@@ -99,7 +99,7 @@ def complete_auth_flow(idp_name, idp_user_id, user_name, user_email):
 
 def init_app(app):
     global dummy_enabled
-    if app.env == 'development':
+    if app.config['DEV_MODE']:
         dummy_enabled = True
     app.register_blueprint(login_blueprint, url_prefix='/auth')
     login_manager.login_view = 'login.login'
