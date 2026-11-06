@@ -1,7 +1,9 @@
 import secrets
 from flask import Blueprint, render_template, session, request, redirect, abort, url_for, current_app, Response
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
-from flask_oauthlib.client import OAuth
+from authlib.integrations.flask_client import OAuth, OAuthError
+from authlib.integrations.base_client import MismatchingStateError
+from joserfc.errors import JoseError
 from ..settings import config
 
 from ..models import db, User, UserIdentity
@@ -65,6 +67,15 @@ def validate_state():
     del session['oauth_state']
     if request.args.get('state') != expected_state:
         abort(Response(render_template('login-timed-out.html'), 401))
+
+
+def authorize_access_token(remote):
+    try:
+        return remote.authorize_access_token()
+    except MismatchingStateError:
+        abort(Response(render_template('login-timed-out.html'), 401))
+    except (OAuthError, JoseError):
+        return None
 
 
 def complete_auth_flow(idp_name, idp_user_id, user_name, user_email):

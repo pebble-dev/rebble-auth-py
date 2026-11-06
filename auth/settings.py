@@ -43,9 +43,3 @@ config = {
     'RETURN_DEV_PORTAL': f'{http_protocol}://dev-portal.{domain_root}',
     'RETURN_DISCOURSE': environ.get('DISCOURSE_URL', f"{http_protocol}://forum.{domain_root}") + '/login'
 }
-
-if 'PEBBLE_CONSUMER_KEY' in environ and 'PEBBLE_CONSUMER_SECRET' in environ:
-    config['AUTH_PEBBLE'] = {
-        'consumer_key': environ['PEBBLE_CONSUMER_KEY'],
-        'consumer_secret': environ['PEBBLE_CONSUMER_SECRET']
-    }

@@ -5,7 +5,7 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 
 from .models import init_app as init_db, db
 from .login import init_app as init_login
-from .login.pebble import ensure_pebble, pebble
+from .login.pebble import ensure_pebble
 from .oauth import init_app as init_oauth
 from .api import init_app as init_api
 from .redis import init_app as init_redis

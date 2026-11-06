@@ -1,39 +1,29 @@
-from flask import g
-
 from ..models import db
-from .base import auth, login_blueprint, complete_auth_flow, secure_url_for, prepare_state, validate_state, get_state
+from ..settings import config
+from .base import auth, login_blueprint, complete_auth_flow, secure_url_for, authorize_access_token
 
-facebook = auth.remote_app(
+facebook = auth.register(
     'facebook',
-    base_url='https://graph.facebook.com/',
-    request_token_url=None,
-    access_token_method='POST',
+    client_id=config['AUTH_FACEBOOK']['consumer_key'],
+    client_secret=config['AUTH_FACEBOOK']['consumer_secret'],
+    api_base_url='https://graph.facebook.com/',
     access_token_url='https://graph.facebook.com/v3.0/oauth/access_token',
     authorize_url='https://www.facebook.com/v3.0/dialog/oauth',
-    request_token_params={'scope': 'email', 'state': get_state},
-    app_key='AUTH_FACEBOOK',
+    client_kwargs={'scope': 'email', 'token_endpoint_auth_method': 'client_secret_post'},
 )
 
 
 @login_blueprint.route("/facebook")
 def facebook_auth_start():
-    prepare_state()
-    return facebook.authorize(secure_url_for('.facebook_auth_complete'))
+    return facebook.authorize_redirect(secure_url_for('.facebook_auth_complete'))
 
 
 @login_blueprint.route("/facebook/complete")
 def facebook_auth_complete():
-    validate_state()
-    resp = facebook.authorized_response()
-    if resp is None or resp.get('access_token') is None:
+    token = authorize_access_token(facebook)
+    if token is None or token.get('access_token') is None:
         return 'Failed.'
-    g.facebook_token = (resp['access_token'], '')
-    me = facebook.get('me?fields=id,name,email').data
+    me = facebook.get('me?fields=id,name,email', token=token).json()
     response = complete_auth_flow(facebook.name, me["id"], me["name"], me.get('email',  None))
     db.session.commit()
     return response
-
-
-@facebook.tokengetter
-def get_token():
-    return g.facebook_token
