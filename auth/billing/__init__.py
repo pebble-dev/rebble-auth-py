@@ -18,6 +18,12 @@ billing_blueprint = Blueprint("billing", __name__)
 def format_ts(value, format='%B %-d, %Y'):
     return datetime.datetime.utcfromtimestamp(value).strftime(format)
 
+def _line_subscription(line):
+    line = line.to_dict()
+    if line.get('subscription'):
+        return line['subscription']
+    parent = line.get('parent') or {}
+    return (parent.get('subscription_item_details') or {}).get('subscription')
 
 @billing_blueprint.route('/account/')
 @login_required
@@ -158,8 +164,9 @@ def stripe_event():
         # try and figure out if we care about this.
         results = []
         for line in event.data.object.lines.data:
-            if line.subscription:
-                user = User.query.filter_by(stripe_subscription_id=line.subscription).one_or_none()
+            subscription_id = _line_subscription(line)
+            if subscription_id:
+                user = User.query.filter_by(stripe_subscription_id=subscription_id).one_or_none()
                 if user is not None:
                     user.subscription_expiry = datetime.datetime.utcfromtimestamp(line.period.end) + datetime.timedelta(days=1)
                     db.session.commit()
