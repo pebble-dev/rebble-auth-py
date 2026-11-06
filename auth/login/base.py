@@ -1,4 +1,6 @@
 import secrets
+from urllib.parse import urlsplit
+
 from flask import Blueprint, render_template, session, request, redirect, abort, url_for, current_app, Response
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
 from authlib.integrations.flask_client import OAuth, OAuthError
@@ -45,7 +47,9 @@ def logout():
 
 def redirect_next():
     next_url = session.get('next') or '/'
-    if next_url.startswith('//') or ':' in next_url:
+    if (not next_url.startswith('/') or next_url.startswith(('//', '/\\'))
+            or any(c in next_url for c in '\t\r\n')
+            or urlsplit(next_url).scheme or urlsplit(next_url).netloc):
         next_url = '/'
     return redirect(next_url)
 
