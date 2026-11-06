@@ -1,7 +1,11 @@
 import secrets
+from urllib.parse import urlsplit
+
 from flask import Blueprint, render_template, session, request, redirect, abort, url_for, current_app, Response
 from flask_login import LoginManager, login_user, current_user, login_required, logout_user
-from flask_oauthlib.client import OAuth
+from authlib.integrations.flask_client import OAuth, OAuthError
+from authlib.integrations.base_client import MismatchingStateError
+from joserfc.errors import JoseError
 from ..settings import config
 
 from ..models import db, User, UserIdentity
@@ -43,7 +47,9 @@ def logout():
 
 def redirect_next():
     next_url = session.get('next') or '/'
-    if next_url.startswith('//') or ':' in next_url:
+    if (not next_url.startswith('/') or next_url.startswith(('//', '/\\'))
+            or any(c in next_url for c in '\t\r\n')
+            or urlsplit(next_url).scheme or urlsplit(next_url).netloc):
         next_url = '/'
     return redirect(next_url)
 
@@ -65,6 +71,15 @@ def validate_state():
     del session['oauth_state']
     if request.args.get('state') != expected_state:
         abort(Response(render_template('login-timed-out.html'), 401))
+
+
+def authorize_access_token(remote):
+    try:
+        return remote.authorize_access_token()
+    except MismatchingStateError:
+        abort(Response(render_template('login-timed-out.html'), 401))
+    except (OAuthError, JoseError):
+        return None
 
 
 def complete_auth_flow(idp_name, idp_user_id, user_name, user_email):
@@ -99,7 +114,7 @@ def complete_auth_flow(idp_name, idp_user_id, user_name, user_email):
 
 def init_app(app):
     global dummy_enabled
-    if app.env == 'development':
+    if app.config['DEV_MODE']:
         dummy_enabled = True
     app.register_blueprint(login_blueprint, url_prefix='/auth')
     login_manager.login_view = 'login.login'
