@@ -33,6 +33,8 @@ config = {
     },
     'STRIPE_SECRET_KEY': environ['STRIPE_SECRET_KEY'],
     'STRIPE_PUBLIC_KEY': environ['STRIPE_PUBLIC_KEY'],
+    # Pinned: the billing code relies on this version's object shapes.
+    'STRIPE_API_VERSION': '2018-05-21',
     'STRIPE_WEBHOOK_KEY': environ.get('STRIPE_WEBHOOK_KEY'),
     'STRIPE_MONTHLY_PLAN': environ.get('STRIPE_MONTHLY_PLAN'),
     'STRIPE_ANNUAL_PLAN': environ.get('STRIPE_ANNUAL_PLAN'),

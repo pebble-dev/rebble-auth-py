@@ -12,6 +12,7 @@ from flask.cli import with_appcontext
 import click
 
 stripe.api_key = config['STRIPE_SECRET_KEY']
+stripe.api_version = config['STRIPE_API_VERSION']
 wizard_blueprint = Blueprint("wizard", __name__)
 
 def format_datetime(value, format='%B %-d %Y, %H:%M:%S'):

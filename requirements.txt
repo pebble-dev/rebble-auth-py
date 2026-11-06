@@ -27,7 +27,7 @@ redis==8.1.0
 requests==2.34.2
 requests-oauthlib==1.1.0
 sqlalchemy==2.0.55
-stripe==1.82.2
+stripe==16.0.0
 typing-extensions==4.16.0
 tzdata==2026.5 ; sys_platform == 'win32'
 urllib3==2.8.0
