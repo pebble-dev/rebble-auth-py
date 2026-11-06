@@ -84,6 +84,30 @@ class AuthClient(db.Model):
     def default_redirect_uri(self):
         return self.redirect_uris[0]
 
+    def get_client_id(self):
+        return self.client_id
+
+    def get_default_redirect_uri(self):
+        return self.default_redirect_uri
+
+    def get_allowed_scope(self, scope):
+        return scope or ' '.join(self.default_scopes or [])
+
+    def check_redirect_uri(self, redirect_uri):
+        return redirect_uri in (self.redirect_uris or [])
+
+    def check_client_secret(self, client_secret):
+        return not self.is_confidential or client_secret == self.client_secret # todo: harden
+
+    def check_endpoint_auth_method(self, method, endpoint):
+        return not self.is_confidential or method != 'none'
+
+    def check_response_type(self, response_type):
+        return response_type == 'code'
+
+    def check_grant_type(self, grant_type):
+        return grant_type in ('authorization_code', 'refresh_token')
+
 
 class IssuedToken(db.Model):
     __tablename__ = "issued_tokens"
@@ -98,6 +122,11 @@ class IssuedToken(db.Model):
     refresh_token = db.Column(db.String, unique=True)
     token_type = 'bearer'
 
+    def check_client(self, client):
+        return self.client_id == client.client_id
+
+    def get_scope(self):
+        return ' '.join(self.scopes or [])
 
     def delete(self):
         db.session.delete(self)

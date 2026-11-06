@@ -1,13 +1,12 @@
-import os
-
 from flask import render_template, request, abort, Blueprint
 
 from ..models import db
+from ..settings import config
 from .base import login_blueprint, complete_auth_flow, prepare_state, validate_state, get_state
 
 dummy = None
 
-if os.environ.get('FLASK_ENV', 'production') == 'development':
+if config['DEV_MODE']:
     @login_blueprint.route("/dummy")
     def dummy_auth_start():
         prepare_state()

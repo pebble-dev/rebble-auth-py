@@ -12,6 +12,7 @@ from flask.cli import with_appcontext
 import click
 
 stripe.api_key = config['STRIPE_SECRET_KEY']
+stripe.api_version = config['STRIPE_API_VERSION']
 wizard_blueprint = Blueprint("wizard", __name__)
 
 def format_datetime(value, format='%B %-d %Y, %H:%M:%S'):
@@ -63,7 +64,7 @@ def user_search():
     
     return render_template('wizard/user_search.html', users = users, search = search)
 
-@wizard_blueprint.route("/user/<id>")
+@wizard_blueprint.route("/user/<int:id>")
 @login_required
 def user_by_id(id):
     ensure_wizard()
@@ -81,7 +82,7 @@ def user_by_id(id):
 
     return render_template('wizard/user.html', user = user, identities = identities, subscription = subscription)
 
-@wizard_blueprint.route("/user/<id>/modify", methods=["POST"])
+@wizard_blueprint.route("/user/<int:id>/modify", methods=["POST"])
 @login_required
 def user_modify(id):
     ensure_wizard()
@@ -109,7 +110,7 @@ def user_modify(id):
     
     return render_template('wizard/user_modify.html', user = user, what = what, old = old, new = new)
 
-@wizard_blueprint.route("/user/<id>/movesubscription", methods=["GET", "POST"])
+@wizard_blueprint.route("/user/<int:id>/movesubscription", methods=["GET", "POST"])
 @login_required
 def user_movesubscription(id):
     ensure_wizard()
@@ -120,7 +121,7 @@ def user_movesubscription(id):
         dest = request.args.get("dest")
     else:
         dest = request.form.get("dest")
-    destuser = User.query.filter_by(id = dest).one()
+    destuser = User.query.filter_by(id = int(dest)).one()
 
     possible = olduser.has_active_sub and not destuser.has_active_sub
     if request.method == 'POST' and possible:
@@ -163,7 +164,7 @@ def useridentity_moveto(id):
     else:
         dest = request.form.get("dest")
     olduser = identity.user
-    destuser = User.query.filter_by(id = dest).one()
+    destuser = User.query.filter_by(id = int(dest)).one()
     nidentities = UserIdentity.query.filter_by(user = identity.user).count()
     
     if request.method == "POST":

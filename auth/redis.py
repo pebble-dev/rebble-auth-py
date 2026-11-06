@@ -6,7 +6,7 @@ class ConnectLaterRedis:
         self.__redis = None
 
     def _connect(self, url):
-        self.__redis = redis.StrictRedis.from_url(url)
+        self.__redis = redis.StrictRedis.from_url(url, protocol=2)
 
     def __getattr__(self, item):
         return getattr(self.__redis, item)
