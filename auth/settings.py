@@ -30,7 +30,6 @@ config = {
     'STRIPE_WEBHOOK_KEY': environ.get('STRIPE_WEBHOOK_KEY'),
     'STRIPE_MONTHLY_PLAN': environ.get('STRIPE_MONTHLY_PLAN'),
     'STRIPE_ANNUAL_PLAN': environ.get('STRIPE_ANNUAL_PLAN'),
-    'HONEYCOMB_KEY': environ.get('HONEYCOMB_KEY', None),
     'DISCOURSE_SECRET': environ.get('DISCOURSE_SECRET', None),
     'DISCOURSE_URL': environ.get('DISCOURSE_URL', f"{http_protocol}://forum.{domain_root}"),
     'RETURN_DEV_PORTAL': f'{http_protocol}://dev-portal.{domain_root}',
