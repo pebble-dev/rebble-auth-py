@@ -1,7 +1,7 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect
 from flask_login import login_required, current_user
-from flask_sslify import SSLify
 from flask_wtf import CSRFProtect
+from werkzeug.middleware.proxy_fix import ProxyFix
 
 import os
 
@@ -22,22 +22,7 @@ from .voting import init_app as init_voting
 
 from .settings import config
 
-# Avoid redirecting internal kube requests.  Note that this needs to happen
-# before the SSLify is created.  Note that I don't think it's possible for
-# the outside world to try to call us by 'auth:8080', since that won't make
-# it past the GCLB.
-#
-# XXX: Package this up in a 'just Rebble things' package, along with some of
-# our other Beeline hacks.
-
 from wrapt import wrap_function_wrapper
-
-def _redirect_to_ssl(fn, instance, args, kwargs):
-    if request.host == 'auth:8080':
-        return
-    return fn(*args, **kwargs)
-
-wrap_function_wrapper('flask_sslify', 'SSLify.redirect_to_ssl', _redirect_to_ssl)
 
 from beeline.trace import _should_sample
 def sampler(fields):
@@ -60,8 +45,13 @@ def sampler(fields):
     return False, 0
 
 app = Flask(__name__)
+app.wsgi_app = ProxyFix(app.wsgi_app, x_proto=1)
 CSRFProtect(app)
 app.config.update(**config)
+# Before ProxyFix we never saw requests as HTTPS, so Flask-WTF's HTTPS-only
+# Referer check never ran.  Keep it that way rather than start rejecting
+# browsers that strip Referer; the CSRF token is still required.
+app.config['WTF_CSRF_SSL_STRICT'] = False
 if os.environ.get('O11Y_SHOULD_USE_W3C_TRACE_HEADERS', False):
     # Only turn this on once EVERYTHING has migrated to the new
     # rws_common version that supports W3C trace headers.
@@ -69,7 +59,16 @@ if os.environ.get('O11Y_SHOULD_USE_W3C_TRACE_HEADERS', False):
 else:
     beeline.init(writekey=config['HONEYCOMB_KEY'], dataset='rws', service_name='auth', sampler_hook=sampler)
 HoneyMiddleware(app, db_events = True)
-sslify = SSLify(app, skips=['heartbeat'])
+
+# Replaces Flask-SSLify.  Internal kube requests come in as 'auth:8080';
+# it's impossible for the outside world to call us by that name,
+# since that won't make it past the GCLB.
+@app.before_request
+def redirect_to_https():
+    if request.is_secure or app.debug or request.host == 'auth:8080' or request.path.startswith('/heartbeat'):
+        return
+    return redirect(request.url.replace('http://', 'https://', 1))
+
 if not app.debug:
     app.config['PREFERRED_URL_SCHEME'] = 'https'
 init_db(app)
