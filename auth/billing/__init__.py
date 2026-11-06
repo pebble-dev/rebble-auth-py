@@ -11,12 +11,19 @@ from auth.settings import config
 import json
 
 stripe.api_key = config['STRIPE_SECRET_KEY']
+stripe.api_version = config['STRIPE_API_VERSION']
 billing_blueprint = Blueprint("billing", __name__)
 
 
 def format_ts(value, format='%B %-d, %Y'):
     return datetime.datetime.utcfromtimestamp(value).strftime(format)
 
+def _line_subscription(line):
+    line = line.to_dict()
+    if line.get('subscription'):
+        return line['subscription']
+    parent = line.get('parent') or {}
+    return (parent.get('subscription_item_details') or {}).get('subscription')
 
 @billing_blueprint.route('/account/')
 @login_required
@@ -51,9 +58,8 @@ def create_subscription():
     if current_user.stripe_customer_id:
         customer = stripe.Customer.retrieve(current_user.stripe_customer_id)
         if ('deleted' not in customer) or (not customer.deleted):
-            customer.source = request.form['stripeToken']
             try:
-                customer.save()
+                customer = stripe.Customer.modify(customer.id, source=request.form['stripeToken'])
             except (stripe.error.CardError, stripe.error.InvalidRequestError) as e:
                 return handle_card_error(e)
         else:
@@ -70,7 +76,7 @@ def create_subscription():
             )
         except stripe.error.CardError as e:
             return handle_card_error(e)
-        current_user.stripe_customer_id = customer.stripe_id
+        current_user.stripe_customer_id = customer.id
     start_date = None
     to_cancel = None
     if current_user.stripe_subscription_id:
@@ -82,13 +88,13 @@ def create_subscription():
             start_date = sub.current_period_end
     try:
         sub = stripe.Subscription.create(
-            customer=customer.stripe_id,
+            customer=customer.id,
             items=[{"plan": plan}],
             trial_end=start_date,
         )
     except (stripe.error.CardError, stripe.error.InvalidRequestError) as e:
         return handle_card_error(e)
-    current_user.stripe_subscription_id = sub.stripe_id
+    current_user.stripe_subscription_id = sub.id
     current_user.subscription_expiry = datetime.datetime.utcfromtimestamp(sub.current_period_end).replace(tzinfo=datetime.timezone.utc) + datetime.timedelta(days=1)
     db.session.commit()
     if to_cancel:
@@ -158,8 +164,9 @@ def stripe_event():
         # try and figure out if we care about this.
         results = []
         for line in event.data.object.lines.data:
-            if line.subscription:
-                user = User.query.filter_by(stripe_subscription_id=line.subscription).one_or_none()
+            subscription_id = _line_subscription(line)
+            if subscription_id:
+                user = User.query.filter_by(stripe_subscription_id=subscription_id).one_or_none()
                 if user is not None:
                     user.subscription_expiry = datetime.datetime.utcfromtimestamp(line.period.end) + datetime.timedelta(days=1)
                     db.session.commit()

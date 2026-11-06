@@ -3,11 +3,17 @@ from os import environ
 domain_root = environ.get('DOMAIN_ROOT')
 http_protocol = environ.get('HTTP_PROTOCOL', 'https')
 
+database_url = environ['DATABASE_URL']
+for scheme in ('postgres://', 'postgresql://'):
+    if database_url.startswith(scheme):
+        database_url = 'postgresql+psycopg://' + database_url[len(scheme):] # todo: change in gcp?
+
 config = {
     'SECRET_KEY': environ['SECRET_KEY'],
     'DOMAIN_ROOT': domain_root,
+    'DEV_MODE': environ.get('FLASK_ENV') == 'development',
 #    'SERVER_NAME': f"auth.{environ['DOMAIN_ROOT']}",
-    'SQLALCHEMY_DATABASE_URI': environ['DATABASE_URL'],
+    'SQLALCHEMY_DATABASE_URI': database_url,
     'REDIS_URL': environ['REDIS_URL'],
     'AUTH_GOOGLE': {
         'consumer_key': environ['GOOGLE_CONSUMER_KEY'],
@@ -27,18 +33,13 @@ config = {
     },
     'STRIPE_SECRET_KEY': environ['STRIPE_SECRET_KEY'],
     'STRIPE_PUBLIC_KEY': environ['STRIPE_PUBLIC_KEY'],
+    # Pinned: the billing code relies on this version's object shapes.
+    'STRIPE_API_VERSION': '2018-05-21',
     'STRIPE_WEBHOOK_KEY': environ.get('STRIPE_WEBHOOK_KEY'),
     'STRIPE_MONTHLY_PLAN': environ.get('STRIPE_MONTHLY_PLAN'),
     'STRIPE_ANNUAL_PLAN': environ.get('STRIPE_ANNUAL_PLAN'),
-    'HONEYCOMB_KEY': environ.get('HONEYCOMB_KEY', None),
     'DISCOURSE_SECRET': environ.get('DISCOURSE_SECRET', None),
     'DISCOURSE_URL': environ.get('DISCOURSE_URL', f"{http_protocol}://forum.{domain_root}"),
     'RETURN_DEV_PORTAL': f'{http_protocol}://dev-portal.{domain_root}',
     'RETURN_DISCOURSE': environ.get('DISCOURSE_URL', f"{http_protocol}://forum.{domain_root}") + '/login'
 }
-
-if 'PEBBLE_CONSUMER_KEY' in environ and 'PEBBLE_CONSUMER_SECRET' in environ:
-    config['AUTH_PEBBLE'] = {
-        'consumer_key': environ['PEBBLE_CONSUMER_KEY'],
-        'consumer_secret': environ['PEBBLE_CONSUMER_SECRET']
-    }
