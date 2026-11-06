@@ -131,7 +131,7 @@ def wizard_update_user_developer_id():
         return jsonify(error="Missing required field: developer_id", e="missing.field.developer_id"), 400
 
     try:
-        user = User.query.filter_by(id = req["user_id"]).one()
+        user = User.query.filter_by(id = int(str(req["user_id"]))).one()
     except NoResultFound:
         return jsonify(error="Invalid user ID", e="invalid.field.user_id"), 400
     except Exception:
